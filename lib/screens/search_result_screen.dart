@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -47,8 +48,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
         centerTitle: true,
         title: Text(
           widget.searchKeyword,
-          style: const TextStyle(
-            color: Color.fromARGB(255, 54, 54, 54),
+          style: TextStyle(
+            color: FlavorConfig.instance.variables['appBlack'],
             fontWeight: FontWeight.w800,
             fontSize: 20,
           ),
@@ -83,12 +84,12 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
               );
             },
             noItemsFoundIndicatorBuilder: (context) {
-              return const Center(
+              return Center(
                 child: Text(
                   'RESULT\nNOT\nFOUND',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Color.fromARGB(255, 192, 192, 192),
+                    color: FlavorConfig.instance.variables['appGrey'],
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
                     height: 1,

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import '../models/menu_model.dart';
 import '../models/post_model.dart';
@@ -7,11 +8,11 @@ import '../models/post_model.dart';
 class PostController {
   final Dio dio = Dio(
     BaseOptions(
+      baseUrl: FlavorConfig.instance.variables['apiBaseUrl'],
       receiveTimeout: const Duration(minutes: 1),
       connectTimeout: const Duration(minutes: 1),
     ),
   );
-  final baseUrl = 'https://kontenation.com/wp-json/wp/v2';
 
   final numberOfPostsPerRequest = 10;
   final PagingController<int, Post> allPostController =
@@ -32,7 +33,9 @@ class PostController {
   Future<List<Post>?> getAllPost(int pageKey) async {
     List<Post>? postList;
     try {
-      final response = await dio.get('$baseUrl/posts?page=$pageKey');
+      final response = await dio.get('/posts', queryParameters: {
+        'page': pageKey,
+      });
 
       List? postData = response.data;
       postList = postData!.map((e) => Post.fromJson(e)).toList();
@@ -59,7 +62,7 @@ class PostController {
   }
 
   Future<Menu> getAllMenu() async {
-    final response = await dio.get('$baseUrl/menus');
+    final response = await dio.get('/menus');
 
     Map<String, dynamic> menuData = response.data;
 
@@ -73,7 +76,7 @@ class PostController {
   }) async {
     List<Post>? postList;
     try {
-      final menuResponse = await dio.get('$baseUrl/menus');
+      final menuResponse = await dio.get('/menus');
 
       Map<String, dynamic> menuData = menuResponse.data;
 
@@ -82,8 +85,10 @@ class PostController {
       int categoryID =
           int.parse(menuResult.primary[categoryIndex].parent.itemId);
 
-      final response =
-          await dio.get('$baseUrl/posts?page=$pageKey&categories=$categoryID');
+      final response = await dio.get('/posts', queryParameters: {
+        'page': pageKey,
+        'categories': categoryID,
+      });
 
       List? postData = response.data;
       postList = postData!.map((e) => Post.fromJson(e)).toList();

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -26,7 +27,7 @@ class ImageDetailScreen extends StatelessWidget {
       String appPath = (await getTemporaryDirectory()).path;
       String imagePath = path.basename(imageUrl);
 
-      var localPath = path.join(appPath, imagePath);
+      String localPath = path.join(appPath, imagePath);
 
       File imageFile = await File(localPath).create();
       return imageFile.writeAsBytes(response.data);
@@ -34,25 +35,25 @@ class ImageDetailScreen extends StatelessWidget {
 
     void saveToGallery() async {
       downloadImage().then((value) async {
-        await GallerySaver.saveImage(value.path, albumName: 'ININEWS');
+        await GallerySaver.saveImage(
+          value.path,
+          albumName: FlavorConfig.instance.variables['appName'],
+        );
       }).catchError((onError) {
-        print(onError);
+        debugPrint(onError);
       });
     }
-    /* void saveToGallery() async {
-      String imagePath = imageUrl;
-      await GallerySaver.saveImage(imagePath, albumName: 'ININEWS');
-    } */
 
     return Scaffold(
       extendBodyBehindAppBar: true,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         systemOverlayStyle: SystemUiOverlayStyle.light,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black.withOpacity(0.2),
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
           onPressed: () {
-            Navigator.of(context).pop;
+            Navigator.pop(context);
           },
           icon: const Icon(
             Icons.arrow_back,
@@ -66,6 +67,7 @@ class ImageDetailScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Saved to Gallery'),
+                  backgroundColor: Colors.black,
                 ),
               );
             },

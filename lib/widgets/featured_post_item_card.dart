@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class FeaturedPostItem extends StatelessWidget {
@@ -52,12 +53,13 @@ class FeaturedPostItem extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
-                    color: Colors.orange[300]!.withOpacity(0.25),
+                    color: FlavorConfig
+                        .instance.variables['appSecondaryAccentColor'],
                   ),
                   child: Text(
                     postCategory!,
-                    style: const TextStyle(
-                      color: Colors.orange,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
                     ),
@@ -96,12 +98,12 @@ class FeaturedPostItem extends StatelessWidget {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.width / 1.5,
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 224, 224, 224),
+              color: FlavorConfig.instance.variables['appLightGrey'],
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 192, 192, 192),
+                color: FlavorConfig.instance.variables['appGrey'],
                 size: 50,
               ),
             ),
@@ -112,7 +114,7 @@ class FeaturedPostItem extends StatelessWidget {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.width / 1.5,
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 224, 224, 224),
+              color: FlavorConfig.instance.variables['appLightGrey'],
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Center(

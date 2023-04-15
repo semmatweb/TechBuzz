@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import '../models/post_model.dart';
 import '../models/tag_model.dart';
@@ -7,11 +8,11 @@ import '../models/tag_model.dart';
 class TagController {
   final Dio dio = Dio(
     BaseOptions(
+      baseUrl: FlavorConfig.instance.variables['apiBaseUrl'],
       receiveTimeout: const Duration(minutes: 1),
       connectTimeout: const Duration(minutes: 1),
     ),
   );
-  final baseUrl = 'https://kontenation.com/wp-json/wp/v2';
 
   final numberOfPostsPerRequest = 10;
   final PagingController<int, Post> filteredPostController =
@@ -20,7 +21,7 @@ class TagController {
   Future<List<Tag>?> getAllTagsFromPost(int postID) async {
     List<Tag>? tagList;
     try {
-      var response = await dio.get('$baseUrl/tags?post=$postID');
+      var response = await dio.get('/tags?post=$postID');
 
       List? tagData = response.data;
       tagList = tagData!.map((e) => Tag.fromJson(e)).toList();
@@ -45,8 +46,10 @@ class TagController {
   }) async {
     List<Post>? postList;
     try {
-      final response =
-          await dio.get('$baseUrl/posts?page=$pageKey&tags=$tagID');
+      final response = await dio.get('/posts', queryParameters: {
+        'page': pageKey,
+        'tags': tagID,
+      });
 
       List? postData = response.data;
       postList = postData!.map((e) => Post.fromJson(e)).toList();
@@ -60,13 +63,13 @@ class TagController {
       }
     } on DioError catch (e) {
       if (e.response != null) {
-        debugPrint('HomeTabController: Dio error!');
-        debugPrint('HomeTabController: STATUS: ${e.response?.statusCode}');
-        debugPrint('HomeTabController: DATA: ${e.response?.data}');
-        debugPrint('HomeTabController: HEADERS: ${e.response?.headers}');
+        debugPrint('TagController: Dio error!');
+        debugPrint('TagController: STATUS: ${e.response?.statusCode}');
+        debugPrint('TagController: DATA: ${e.response?.data}');
+        debugPrint('TagController: HEADERS: ${e.response?.headers}');
       } else {
-        debugPrint('HomeTabController: DIO: Error sending request!');
-        debugPrint('HomeTabController: DIO: ${e.message}');
+        debugPrint('TagController: DIO: Error sending request!');
+        debugPrint('TagController: DIO: ${e.message}');
       }
     }
     return postList;

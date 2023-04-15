@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -43,6 +44,7 @@ class PostDetailScreen extends StatefulWidget {
 class _PostDetailScreenState extends State<PostDetailScreen> {
   final _controller = PostDetailController();
   final _bookmarkController = BookmarkController();
+  BookmarkDBManager bookmarkDatabase = BookmarkDBManager.instance;
   bool isBookmarkAlreadyExist = false;
 
   @override
@@ -52,7 +54,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   }
 
   void checkBookmarkData() async {
-    BookmarkDBManager bookmarkDatabase = BookmarkDBManager.instance;
     Database db = await bookmarkDatabase.db;
 
     final rawTitleString = parse(widget.postTitle);
@@ -111,6 +112,46 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         final String parsedPostTitleString =
             parse(rawPostTitleString.body!.text).documentElement!.text;
 
+        void bookmarkPost() async {
+          _bookmarkController.addBookmark(
+            postID: postDetailData.id,
+            postTitle: parsedPostTitleString,
+            postCategory: postDetailData.postTerms.first.name,
+            postDateTime: postDetailData.date.toIso8601String(),
+            postImageUrl: postDetailData.featuredImageSrc.large,
+          );
+
+          setState(() {
+            isBookmarkAlreadyExist = true;
+          });
+
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Post bookmarked.'),
+              backgroundColor: Colors.black,
+            ),
+          );
+        }
+
+        void unbookmarkPost() async {
+          Database db = await bookmarkDatabase.db;
+
+          await db.delete("post_bookmark", where: "post_id = ${widget.postID}");
+
+          setState(() {
+            isBookmarkAlreadyExist = false;
+          });
+
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Post removed from bookmark.'),
+              backgroundColor: Colors.black,
+            ),
+          );
+        }
+
         return Scaffold(
           extendBodyBehindAppBar: true,
           extendBody: true,
@@ -123,9 +164,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             toolbarHeight: 0,
           ),
           body: DraggableHome(
-            title: const Text(
-              'ININEWS',
-              style: TextStyle(
+            title: Text(
+              FlavorConfig.instance.variables['appName']
+                  .toString()
+                  .toUpperCase(),
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w900,
                 fontSize: 20,
@@ -155,11 +198,12 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 return Container(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.width / 1.5,
-                  color: const Color.fromARGB(255, 224, 224, 224),
+                  color: FlavorConfig.instance.variables['appLightGrey'],
                   child: Center(
                     child: LoadingAnimationWidget.prograssiveDots(
-                        color: const Color.fromARGB(255, 192, 192, 192),
-                        size: 50),
+                      color: FlavorConfig.instance.variables['appGrey'],
+                      size: 50,
+                    ),
                   ),
                 );
               },
@@ -167,7 +211,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 return Container(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.width / 1.5,
-                  color: const Color.fromARGB(255, 224, 224, 224),
+                  color: FlavorConfig.instance.variables['appLightGrey'],
                   child: const Center(
                     child: Icon(Icons.error, size: 50),
                   ),
@@ -175,217 +219,172 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               },
             ),
             body: [
-              Padding(
+              ListView(
+                physics: const NeverScrollableScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => CategoryDetailScreen(
-                                  categoryID: postDetailData.postTerms.first.id,
-                                  categoryName:
-                                      postDetailData.postTerms.first.name,
-                                ),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                const Color.fromARGB(255, 250, 230, 200),
-                            elevation: 0,
-                            surfaceTintColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            maximumSize: Size(
-                              MediaQuery.of(context).size.width / 2,
-                              40,
-                            ),
-                          ),
-                          child: Text(
-                            postDetailData.postTerms.first.name,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.orange,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                        const Spacer(),
-                        ElevatedButton(
-                          onPressed: () {
-                            Share.share(postDetailData.link);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[300],
-                            elevation: 0,
-                            surfaceTintColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                          ),
-                          child: const Icon(
-                            Icons.shortcut,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            final rawBookmarkTitleString =
-                                parse(postDetailData.title.rendered);
-                            final String parsedBookmarkTitleString =
-                                parse(rawBookmarkTitleString.body!.text)
-                                    .documentElement!
-                                    .text;
-
-                            if (isBookmarkAlreadyExist == false) {
-                              _bookmarkController.addBookmark(
-                                postID: postDetailData.id,
-                                postTitle: parsedBookmarkTitleString,
-                                postCategory:
+                shrinkWrap: true,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => CategoryDetailScreen(
+                                categoryID: postDetailData.postTerms.first.id,
+                                categoryName:
                                     postDetailData.postTerms.first.name,
-                                postDateTime:
-                                    postDetailData.date.toIso8601String(),
-                                postImageUrl:
-                                    postDetailData.featuredImageSrc.large,
-                              );
-
-                              setState(() {
-                                isBookmarkAlreadyExist = true;
-                              });
-
-                              if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Post bookmarked.'),
-                                  backgroundColor: Colors.black,
-                                ),
-                              );
-                            } else {
-                              BookmarkDBManager bookmarkDatabase =
-                                  BookmarkDBManager.instance;
-
-                              Database db = await bookmarkDatabase.db;
-
-                              await db.delete("post_bookmark",
-                                  where: "post_id = ${widget.postID}");
-
-                              setState(() {
-                                isBookmarkAlreadyExist = false;
-                              });
-
-                              if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Post removed from bookmark.'),
-                                  backgroundColor: Colors.black,
-                                ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isBookmarkAlreadyExist
-                                ? Theme.of(context)
-                                    .primaryColor
-                                    .withOpacity(0.15)
-                                : Colors.grey[300],
-                            elevation: 0,
-                            surfaceTintColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                          ),
-                          child: Icon(
-                            isBookmarkAlreadyExist
-                                ? Icons.bookmark
-                                : Icons.bookmark_add_outlined,
-                            color: isBookmarkAlreadyExist
-                                ? Theme.of(context).primaryColor
-                                : Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      parsedPostTitleString,
-                      style: const TextStyle(
-                        color: Color.fromARGB(255, 54, 54, 54),
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            const Text(
-                              'by ',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color.fromARGB(255, 54, 54, 54),
                               ),
                             ),
-                            Text(
-                              postDetailData.authorDetails.displayName,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Color.fromARGB(255, 54, 54, 54),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: FlavorConfig
+                              .instance.variables['appSecondaryAccentColor'],
+                          elevation: 0,
+                          surfaceTintColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          maximumSize: Size(
+                            MediaQuery.of(context).size.width / 2,
+                            40,
+                          ),
                         ),
-                        Text(
-                          DateFormat('EEE, dd MMMM y')
-                              .format(postDetailData.date),
-                          style: const TextStyle(
+                        child: Text(
+                          postDetailData.postTerms.first.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontWeight: FontWeight.w600,
                             fontSize: 14,
-                            color: Color.fromARGB(255, 54, 54, 54),
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    const Divider(
-                      color: Color.fromARGB(255, 224, 224, 224),
-                      thickness: 2,
-                    ),
-                    const SizedBox(height: 20),
-                    HtmlWidget(
-                      postDetailData.content.rendered,
-                      textStyle: const TextStyle(
-                        color: Color.fromARGB(255, 54, 54, 54),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
                       ),
-                      enableCaching: true,
-                      onTapImage: (imageMetadata) {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ImageDetailScreen(
-                              imageUrl: imageMetadata.sources.first.url,
+                      const Spacer(),
+                      ElevatedButton(
+                        onPressed: () {
+                          Share.share(postDetailData.link);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              FlavorConfig.instance.variables['appLightGrey'],
+                          elevation: 0,
+                          surfaceTintColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                        ),
+                        child: Icon(
+                          Icons.shortcut,
+                          color: FlavorConfig.instance.variables['appGrey'],
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (isBookmarkAlreadyExist == false) {
+                            bookmarkPost();
+                          } else {
+                            unbookmarkPost();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isBookmarkAlreadyExist
+                              ? FlavorConfig
+                                  .instance.variables['appPrimaryAccentColor']
+                              : FlavorConfig.instance.variables['appLightGrey'],
+                          elevation: 0,
+                          surfaceTintColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                        ),
+                        child: Icon(
+                          isBookmarkAlreadyExist
+                              ? Icons.bookmark
+                              : Icons.bookmark_add_outlined,
+                          color: isBookmarkAlreadyExist
+                              ? Theme.of(context).primaryColor
+                              : FlavorConfig.instance.variables['appGrey'],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    parsedPostTitleString,
+                    style: TextStyle(
+                      color: FlavorConfig.instance.variables['appBlack'],
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'by ',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color:
+                                  FlavorConfig.instance.variables['appBlack'],
                             ),
                           ),
-                        );
-                      },
+                          Text(
+                            postDetailData.authorDetails.displayName,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color:
+                                  FlavorConfig.instance.variables['appBlack'],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        DateFormat('EEE, dd MMMM y')
+                            .format(postDetailData.date),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: FlavorConfig.instance.variables['appBlack'],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Divider(
+                    color: FlavorConfig.instance.variables['appLightGrey'],
+                    thickness: 2,
+                  ),
+                  const SizedBox(height: 20),
+                  HtmlWidget(
+                    postDetailData.content.rendered,
+                    textStyle: TextStyle(
+                      color: FlavorConfig.instance.variables['appBlack'],
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
-                    PostTag(postID: widget.postID),
-                    RelatedPost(
-                      categoryID: postDetailData.postTerms.first.id,
-                      postKeyword: parsedPostTitleString.split('').first,
-                      excludePostID: postDetailData.id,
-                    ),
-                    const SizedBox(height: 30),
-                  ],
-                ),
+                    enableCaching: true,
+                    onTapImage: (imageMetadata) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ImageDetailScreen(
+                            imageUrl: imageMetadata.sources.first.url,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  PostTag(postID: widget.postID),
+                  RelatedPost(
+                    categoryID: postDetailData.postTerms.first.id,
+                    postKeyword: parsedPostTitleString.split('').first,
+                    excludePostID: postDetailData.id,
+                  ),
+                  const SizedBox(height: 30),
+                ],
               ),
             ],
           ),
@@ -434,10 +433,10 @@ class _PostTagState extends State<PostTag> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-              const Text(
+              Text(
                 'Tag',
                 style: TextStyle(
-                  color: Color.fromARGB(255, 54, 54, 54),
+                  color: FlavorConfig.instance.variables['appBlack'],
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                 ),
@@ -469,8 +468,8 @@ class _PostTagState extends State<PostTag> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Theme.of(context).primaryColor.withOpacity(0.15),
+                      backgroundColor: FlavorConfig
+                          .instance.variables['appPrimaryAccentColor'],
                       elevation: 0,
                       surfaceTintColor: Colors.transparent,
                       shadowColor: Colors.transparent,
@@ -546,15 +545,15 @@ class _RelatedPostState extends State<RelatedPost> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const Divider(
-                color: Color.fromARGB(255, 224, 224, 224),
+              Divider(
+                color: FlavorConfig.instance.variables['appLightGrey'],
                 thickness: 2,
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Related Post',
                 style: TextStyle(
-                  color: Color.fromARGB(255, 54, 54, 54),
+                  color: FlavorConfig.instance.variables['appBlack'],
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                 ),

@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ini_news_flutter",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": ["--flavor", "iniNews", "--target", "lib/main.dart" ]
+    }
+  ],
+  "compounds": []
+}

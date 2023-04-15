@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -49,8 +50,8 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
         centerTitle: true,
         title: Text(
           widget.categoryName,
-          style: const TextStyle(
-            color: Color.fromARGB(255, 54, 54, 54),
+          style: TextStyle(
+            color: FlavorConfig.instance.variables['appBlack'],
             fontWeight: FontWeight.w800,
             fontSize: 20,
           ),
@@ -85,12 +86,12 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
               );
             },
             noItemsFoundIndicatorBuilder: (context) {
-              return const Center(
+              return Center(
                 child: Text(
                   'NO\nPOST',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Color.fromARGB(255, 192, 192, 192),
+                    color: FlavorConfig.instance.variables['appGrey'],
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
                     height: 1,

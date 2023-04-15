@@ -1,19 +1,20 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import '../models/post_model.dart';
 import '../models/post_detail_model.dart';
 
 class PostDetailController {
   final Dio dio = Dio(
     BaseOptions(
+      baseUrl: FlavorConfig.instance.variables['apiBaseUrl'],
       receiveTimeout: const Duration(minutes: 1),
       connectTimeout: const Duration(minutes: 1),
     ),
   );
-  final baseUrl = 'https://kontenation.com/wp-json/wp/v2';
 
   Future<PostDetail> getPostDetail(int? postID) async {
-    var response = await dio.get('$baseUrl/posts/$postID');
+    var response = await dio.get('/posts/$postID');
 
     Map<String, dynamic> postDetailData = response.data;
 
@@ -27,8 +28,13 @@ class PostDetailController {
   }) async {
     List<Post>? postList;
     try {
-      final response = await dio.get(
-          '$baseUrl/posts?per_page=5&categories=$categoryID&search=$searchKeyword&orderby=relevance&exclude=$excludePostID');
+      final response = await dio.get('/posts', queryParameters: {
+        'search': searchKeyword,
+        'categories': categoryID,
+        'per_page': 5,
+        'orderby': 'relevance',
+        'exclude': excludePostID,
+      });
 
       List? postData = response.data;
       postList = postData!.map((e) => Post.fromJson(e)).toList();

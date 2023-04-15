@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class PostItem extends StatelessWidget {
@@ -32,8 +33,8 @@ class PostItem extends StatelessWidget {
               children: [
                 Text(
                   postCategory!,
-                  style: const TextStyle(
-                    color: Colors.orange,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
                     fontWeight: FontWeight.w600,
                     fontSize: 12,
                   ),
@@ -45,8 +46,8 @@ class PostItem extends StatelessWidget {
                   postTitle!,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color.fromARGB(255, 54, 54, 54),
+                  style: TextStyle(
+                    color: FlavorConfig.instance.variables['appBlack'],
                     fontWeight: FontWeight.w700,
                     fontSize: 16,
                   ),
@@ -58,8 +59,8 @@ class PostItem extends StatelessWidget {
                   postDateTime!,
                   maxLines: 1,
                   textAlign: TextAlign.left,
-                  style: const TextStyle(
-                    color: Color.fromARGB(255, 114, 114, 114),
+                  style: TextStyle(
+                    color: FlavorConfig.instance.variables['appDarkGrey'],
                     fontWeight: FontWeight.w500,
                     fontSize: 12,
                   ),
@@ -92,12 +93,12 @@ class PostItem extends StatelessWidget {
                 width: MediaQuery.of(context).size.width / 3.5,
                 height: MediaQuery.of(context).size.width / 3.5,
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 224, 224, 224),
+                  color: FlavorConfig.instance.variables['appLightGrey'],
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
                   child: LoadingAnimationWidget.prograssiveDots(
-                    color: const Color.fromARGB(255, 192, 192, 192),
+                    color: FlavorConfig.instance.variables['appGrey'],
                     size: 50,
                   ),
                 ),
@@ -108,7 +109,7 @@ class PostItem extends StatelessWidget {
                 width: MediaQuery.of(context).size.width / 3.5,
                 height: MediaQuery.of(context).size.width / 3.5,
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 224, 224, 224),
+                  color: FlavorConfig.instance.variables['appLightGrey'],
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Center(

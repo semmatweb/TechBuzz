@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sqflite/sqflite.dart';
@@ -75,27 +76,27 @@ class _BookmarkTabState extends State<BookmarkTab> {
               );
             },
             separatorBuilder: (context, index) => Column(
-              children: const [
-                SizedBox(
+              children: [
+                const SizedBox(
                   height: 20,
                 ),
                 Divider(
                   thickness: 2,
-                  color: Color.fromARGB(255, 224, 224, 224),
+                  color: FlavorConfig.instance.variables['appLightGrey'],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
               ],
             ),
           );
         } else {
-          return const Center(
+          return Center(
             child: Text(
               'NO\nBOOK\nMARK',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Color.fromARGB(255, 192, 192, 192),
+                color: FlavorConfig.instance.variables['appGrey'],
                 fontSize: 32,
                 fontWeight: FontWeight.w800,
                 height: 1,

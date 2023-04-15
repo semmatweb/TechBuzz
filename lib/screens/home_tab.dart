@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -26,35 +27,40 @@ class _HomeTabState extends State<HomeTab> {
   void initState() {
     super.initState();
     _fetchedMenu = _controller.getAllMenu();
+    getAllPost();
+    getFilteredPost(
+      postPagingController: _controller.firstCategoryPostController,
+      categoryIndex: 0,
+    );
+    getFilteredPost(
+      postPagingController: _controller.secondCategoryPostController,
+      categoryIndex: 1,
+    );
+    getFilteredPost(
+      postPagingController: _controller.thirdCategoryPostController,
+      categoryIndex: 2,
+    );
+    getFilteredPost(
+      postPagingController: _controller.fourthCategoryPostController,
+      categoryIndex: 3,
+    );
+  }
+
+  void getAllPost() {
     _controller.allPostController.addPageRequestListener((pageKey) {
       _controller.getAllPost(pageKey);
     });
-    _controller.firstCategoryPostController.addPageRequestListener((pageKey) {
+  }
+
+  void getFilteredPost({
+    required PagingController<int, Post> postPagingController,
+    required int categoryIndex,
+  }) {
+    postPagingController.addPageRequestListener((pageKey) {
       _controller.getFilteredPost(
         pageKey: pageKey,
         categoryIndex: 0,
-        postPagingController: _controller.firstCategoryPostController,
-      );
-    });
-    _controller.secondCategoryPostController.addPageRequestListener((pageKey) {
-      _controller.getFilteredPost(
-        pageKey: pageKey,
-        categoryIndex: 1,
-        postPagingController: _controller.secondCategoryPostController,
-      );
-    });
-    _controller.thirdCategoryPostController.addPageRequestListener((pageKey) {
-      _controller.getFilteredPost(
-        pageKey: pageKey,
-        categoryIndex: 2,
-        postPagingController: _controller.thirdCategoryPostController,
-      );
-    });
-    _controller.fourthCategoryPostController.addPageRequestListener((pageKey) {
-      _controller.getFilteredPost(
-        pageKey: pageKey,
-        categoryIndex: 3,
-        postPagingController: _controller.fourthCategoryPostController,
+        postPagingController: postPagingController,
       );
     });
   }
@@ -92,7 +98,8 @@ class _HomeTabState extends State<HomeTab> {
                 ),
                 labelColor: Theme.of(context).primaryColor,
                 labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                unselectedLabelColor: const Color.fromARGB(255, 114, 114, 114),
+                unselectedLabelColor:
+                    FlavorConfig.instance.variables['appGrey'],
                 unselectedLabelStyle:
                     const TextStyle(fontWeight: FontWeight.w500),
                 indicatorColor: Theme.of(context).primaryColor,
@@ -172,12 +179,12 @@ class PostTab extends StatelessWidget {
             );
           },
           noItemsFoundIndicatorBuilder: (context) {
-            return const Center(
+            return Center(
               child: Text(
                 'NO\nPOST',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Color.fromARGB(255, 192, 192, 192),
+                  color: FlavorConfig.instance.variables['appGrey'],
                   fontSize: 32,
                   fontWeight: FontWeight.w800,
                   height: 1,
@@ -193,7 +200,7 @@ class PostTab extends StatelessWidget {
 
             return Column(
               children: [
-                if (postData == pagingController.itemList!.first)
+                if (postData == pagingController.itemList?.first)
                   FeaturedPostItem(
                     onTap: () {
                       Navigator.of(context).push(
@@ -214,7 +221,7 @@ class PostTab extends StatelessWidget {
                     postCategory: postData.postTerms.first.name,
                     postImageUrl: postData.featuredImageSrc.large,
                   ),
-                if (postData != pagingController.itemList!.first)
+                if (postData != pagingController.itemList?.first)
                   PostItem(
                     onTap: () {
                       Navigator.of(context).push(
