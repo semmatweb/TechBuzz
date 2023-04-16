@@ -13,12 +13,23 @@ class PostDetailController {
     ),
   );
 
-  Future<PostDetail> getPostDetail(int? postID) async {
-    var response = await dio.get('/posts/$postID');
-
-    Map<String, dynamic> postDetailData = response.data;
-
-    return PostDetail.fromJson(postDetailData);
+  Future<PostDetail?> getPostDetail(int? postID) async {
+    PostDetail? postDetail;
+    try {
+      final response = await dio.get('/posts/$postID');
+      postDetail = PostDetail.fromJson(response.data);
+    } on DioError catch (e) {
+      if (e.response != null) {
+        debugPrint('PostDetailController: Dio error!');
+        debugPrint('PostDetailController: STATUS: ${e.response?.statusCode}');
+        debugPrint('PostDetailController: DATA: ${e.response?.data}');
+        debugPrint('PostDetailController: HEADERS: ${e.response?.headers}');
+      } else {
+        debugPrint('PostDetailController: DIO: Error sending request!');
+        debugPrint('PostDetailController: DIO: ${e.message}');
+      }
+    }
+    return postDetail;
   }
 
   Future<List<Post>?> getRelatedPost({

@@ -45,7 +45,7 @@ dependencies:
   dio: ^5.1.1
   html: ^0.15.2
   intl: ^0.18.0
-  flutter_widget_from_html: ^0.9.1
+  flutter_widget_from_html: ^0.10.0
   infinite_scroll_pagination: ^3.2.0
   draggable_home: ^1.0.4
   cached_network_image: ^3.2.3
@@ -97,6 +97,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
+    - assets/images/ 
+    - assets/images/onboarding/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

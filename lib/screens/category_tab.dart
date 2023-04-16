@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../controllers/category_controller.dart';
 import '../models/category_model.dart';
@@ -28,11 +29,65 @@ class _CategoryTabState extends State<CategoryTab> {
     return FutureBuilder<List<Category>?>(
       future: _fetchedCategory,
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
             child: LoadingAnimationWidget.prograssiveDots(
               color: Theme.of(context).primaryColor,
               size: 50,
+            ),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error,
+                  color: Colors.red,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Failed to fetch category',
+                  style: TextStyle(
+                    color: FlavorConfig.instance.variables['appBlack'],
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _fetchedCategory = _controller.getAllCategories();
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FlavorConfig
+                        .instance.variables['appPrimaryAccentColor'],
+                    elevation: 0,
+                    surfaceTintColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                  ),
+                  icon: Icon(
+                    Icons.refresh,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  label: Text(
+                    'Retry',
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         }

@@ -90,10 +90,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       ),
     );
 
-    return FutureBuilder<PostDetail>(
+    return FutureBuilder<PostDetail?>(
       future: _controller.getPostDetail(widget.postID),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(),
@@ -102,6 +102,34 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 color: Theme.of(context).primaryColor,
                 size: 50,
               ),
+            ),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error,
+                  color: Colors.red,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Failed to view post',
+                  style: TextStyle(
+                    color: FlavorConfig.instance.variables['appBlack'],
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+              ],
             ),
           );
         }
@@ -155,6 +183,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         return Scaffold(
           extendBodyBehindAppBar: true,
           extendBody: true,
+          backgroundColor: Colors.white,
           appBar: AppBar(
             systemOverlayStyle: SystemUiOverlayStyle.light,
             automaticallyImplyLeading: false,
@@ -164,6 +193,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             toolbarHeight: 0,
           ),
           body: DraggableHome(
+            backgroundColor: Colors.white,
             title: Text(
               FlavorConfig.instance.variables['appName']
                   .toString()

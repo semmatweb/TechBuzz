@@ -23,77 +23,84 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return IntroductionScreen(
-      key: introKey,
-      curve: Curves.fastLinearToSlowEaseIn,
-      globalBackgroundColor: Colors.white,
-      showSkipButton: true,
-      onSkip: () => _onIntroEnd(context),
-      skip: Text(
-        'Skip',
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+      ),
+      body: IntroductionScreen(
+        key: introKey,
+        curve: Curves.fastLinearToSlowEaseIn,
+        globalBackgroundColor: Colors.white,
+        showSkipButton: true,
+        onSkip: () => _onIntroEnd(context),
+        skip: Text(
+          'Skip',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        skipOrBackFlex: 0,
+        showDoneButton: true,
+        onDone: () => _onIntroEnd(context),
+        done: Text(
+          'Done',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        showNextButton: true,
+        next: Icon(
+          Icons.arrow_forward,
           color: Theme.of(context).primaryColor,
         ),
-      ),
-      skipOrBackFlex: 0,
-      showDoneButton: true,
-      onDone: () => _onIntroEnd(context),
-      done: Text(
-        'Done',
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          color: Theme.of(context).primaryColor,
+        nextFlex: 0,
+        controlsPadding: const EdgeInsets.all(20),
+        dotsDecorator: DotsDecorator(
+          size: const Size.square(10),
+          color: FlavorConfig.instance.variables['appGrey'],
+          activeSize: const Size(24, 10),
+          activeShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
         ),
-      ),
-      showNextButton: true,
-      next: Icon(
-        Icons.arrow_forward,
-        color: Theme.of(context).primaryColor,
-      ),
-      nextFlex: 0,
-      controlsPadding: const EdgeInsets.all(20),
-      dotsDecorator: DotsDecorator(
-        size: const Size.square(10),
-        color: FlavorConfig.instance.variables['appGrey'],
-        activeSize: const Size(24, 10),
-        activeShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-      ),
-      pages: [
-        PageViewModel(
-          useScrollView: true,
-          title: 'Lorem Ipsum',
-          body:
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id euismod lectus, non tempor felis. Nam rutrum rhoncus est ac venenatis.',
-          image: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              image: const DecorationImage(
-                image: AssetImage(
-                  'assets/images/intro/preview_failed.png',
+        pages: [
+          PageViewModel(
+            title: 'Lorem Ipsum',
+            body:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id euismod lectus, non tempor felis. Nam rutrum rhoncus est ac venenatis.',
+            image: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                image: const DecorationImage(
+                  image: AssetImage(
+                    'assets/images/onboarding/intro-placeholder.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
-                fit: BoxFit.cover,
               ),
             ),
-          ),
-          decoration: const PageDecoration(
-            titleTextStyle: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
+            decoration: PageDecoration(
+              bodyFlex: 0,
+              titleTextStyle: TextStyle(
+                color: FlavorConfig.instance.variables['appBlack'],
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
+              ),
+              bodyTextStyle: TextStyle(
+                color: FlavorConfig.instance.variables['appDarkGrey'],
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+              imagePadding: const EdgeInsets.fromLTRB(20, 80, 20, 20),
             ),
-            bodyTextStyle: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-            imagePadding: EdgeInsets.all(20),
           ),
-        ),
-        PageViewModel(
-            image: Image.network(
-              'https://images.unsplash.com/photo-1681159003722-201aaa0bf9c6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
+          PageViewModel(
+            image: Image.asset(
+              'assets/images/onboarding/intro-placeholder.png',
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
@@ -102,51 +109,60 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             body:
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id euismod lectus, non tempor felis. Nam rutrum rhoncus est ac venenatis.',
             decoration: PageDecoration(
-              titleTextStyle: const TextStyle(
+              fullScreen: true,
+              bodyFlex: 0,
+              titleTextStyle: TextStyle(
+                color: FlavorConfig.instance.variables['appBlack'],
+                fontWeight: FontWeight.w600,
                 fontSize: 20,
-                fontWeight: FontWeight.w600,
               ),
-              bodyTextStyle: const TextStyle(
-                fontSize: 16,
+              bodyTextStyle: TextStyle(
+                color: FlavorConfig.instance.variables['appDarkGrey'],
                 fontWeight: FontWeight.w600,
+                fontSize: 16,
               ),
               bodyPadding: const EdgeInsets.all(20),
               contentMargin: const EdgeInsets.all(20),
-              fullScreen: true,
               boxDecoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: Colors.white,
               ),
-            )),
-        PageViewModel(
-          reverse: true,
-          title: 'Lorem Ipsum',
-          body:
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id euismod lectus, non tempor felis. Nam rutrum rhoncus est ac venenatis.',
-          image: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              image: const DecorationImage(
-                image: NetworkImage(
-                    'https://images.unsplash.com/photo-1681159003722-201aaa0bf9c6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'),
-                fit: BoxFit.cover,
+            ),
+          ),
+          PageViewModel(
+            reverse: true,
+            title: 'Lorem Ipsum',
+            body:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id euismod lectus, non tempor felis. Nam rutrum rhoncus est ac venenatis.',
+            image: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                image: const DecorationImage(
+                  image: AssetImage(
+                      'assets/images/onboarding/intro-placeholder.png'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-          decoration: const PageDecoration(
-            titleTextStyle: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
+            decoration: PageDecoration(
+              bodyFlex: 0,
+              titleTextStyle: TextStyle(
+                color: FlavorConfig.instance.variables['appBlack'],
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
+              ),
+              bodyTextStyle: TextStyle(
+                color: FlavorConfig.instance.variables['appDarkGrey'],
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+              titlePadding: const EdgeInsets.only(top: 60),
+              imagePadding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
             ),
-            bodyTextStyle: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-            imagePadding: EdgeInsets.all(20),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -21,7 +21,7 @@ class HomeTab extends StatefulWidget {
 class _HomeTabState extends State<HomeTab> {
   final _controller = PostController();
 
-  Future<Menu>? _fetchedMenu;
+  Future<Menu?>? _fetchedMenu;
 
   @override
   void initState() {
@@ -59,7 +59,7 @@ class _HomeTabState extends State<HomeTab> {
     postPagingController.addPageRequestListener((pageKey) {
       _controller.getFilteredPost(
         pageKey: pageKey,
-        categoryIndex: 0,
+        categoryIndex: categoryIndex,
         postPagingController: postPagingController,
       );
     });
@@ -67,14 +67,68 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Menu>(
+    return FutureBuilder<Menu?>(
       future: _fetchedMenu,
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
             child: LoadingAnimationWidget.prograssiveDots(
               color: Theme.of(context).primaryColor,
               size: 50,
+            ),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error,
+                  color: Colors.red,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Failed to fetch post',
+                  style: TextStyle(
+                    color: FlavorConfig.instance.variables['appBlack'],
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _fetchedMenu = _controller.getAllMenu();
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FlavorConfig
+                        .instance.variables['appPrimaryAccentColor'],
+                    elevation: 0,
+                    surfaceTintColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                  ),
+                  icon: Icon(
+                    Icons.refresh,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  label: Text(
+                    'Retry',
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         }
@@ -153,6 +207,7 @@ class PostTab extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: () => Future.sync(() => pagingController.refresh()),
       color: Theme.of(context).primaryColor,
+      backgroundColor: Colors.white,
       child: PagedListView<int, Post>.separated(
         pagingController: pagingController,
         physics: const BouncingScrollPhysics(
@@ -170,11 +225,90 @@ class PostTab extends StatelessWidget {
               ),
             );
           },
+          firstPageErrorIndicatorBuilder: (context) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Failed to fetch post',
+                    style: TextStyle(
+                      color: FlavorConfig.instance.variables['appBlack'],
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      pagingController.refresh();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: FlavorConfig
+                          .instance.variables['appPrimaryAccentColor'],
+                      elevation: 0,
+                      surfaceTintColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                    ),
+                    icon: Icon(
+                      Icons.refresh,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    label: Text(
+                      'Retry',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
           newPageProgressIndicatorBuilder: (context) {
             return Center(
               child: LoadingAnimationWidget.prograssiveDots(
                 color: Theme.of(context).primaryColor,
                 size: 50,
+              ),
+            );
+          },
+          newPageErrorIndicatorBuilder: (context) {
+            return Center(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  pagingController.refresh();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      FlavorConfig.instance.variables['appPrimaryAccentColor'],
+                  elevation: 0,
+                  surfaceTintColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                ),
+                icon: Icon(
+                  Icons.refresh,
+                  color: Theme.of(context).primaryColor,
+                ),
+                label: Text(
+                  'Retry',
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
               ),
             );
           },
@@ -200,7 +334,7 @@ class PostTab extends StatelessWidget {
 
             return Column(
               children: [
-                if (postData == pagingController.itemList?.first)
+                if (postData == pagingController.itemList!.first)
                   FeaturedPostItem(
                     onTap: () {
                       Navigator.of(context).push(
@@ -221,7 +355,7 @@ class PostTab extends StatelessWidget {
                     postCategory: postData.postTerms.first.name,
                     postImageUrl: postData.featuredImageSrc.large,
                   ),
-                if (postData != pagingController.itemList?.first)
+                if (postData != pagingController.itemList!.first)
                   PostItem(
                     onTap: () {
                       Navigator.of(context).push(

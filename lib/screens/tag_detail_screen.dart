@@ -60,6 +60,7 @@ class _TagDetailScreenState extends State<TagDetailScreen> {
       body: RefreshIndicator(
         onRefresh: () => Future.sync(() => tagPagingController.refresh()),
         color: Theme.of(context).primaryColor,
+        backgroundColor: Colors.white,
         child: PagedListView<int, Post>.separated(
           pagingController: tagPagingController,
           physics: const BouncingScrollPhysics(
@@ -77,11 +78,90 @@ class _TagDetailScreenState extends State<TagDetailScreen> {
                 ),
               );
             },
+            firstPageErrorIndicatorBuilder: (context) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Failed to fetch post',
+                      style: TextStyle(
+                        color: FlavorConfig.instance.variables['appBlack'],
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        tagPagingController.refresh();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: FlavorConfig
+                            .instance.variables['appPrimaryAccentColor'],
+                        elevation: 0,
+                        surfaceTintColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                      ),
+                      icon: Icon(
+                        Icons.refresh,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      label: Text(
+                        'Retry',
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
             newPageProgressIndicatorBuilder: (context) {
               return Center(
                 child: LoadingAnimationWidget.prograssiveDots(
                   color: Theme.of(context).primaryColor,
                   size: 50,
+                ),
+              );
+            },
+            newPageErrorIndicatorBuilder: (context) {
+              return Center(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    tagPagingController.refresh();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FlavorConfig
+                        .instance.variables['appPrimaryAccentColor'],
+                    elevation: 0,
+                    surfaceTintColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                  ),
+                  icon: Icon(
+                    Icons.refresh,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  label: Text(
+                    'Retry',
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
               );
             },

@@ -6,7 +6,7 @@ import './screens/home_screen.dart';
 
 // Build the app into apk with "flutter build apk --flavor iniNews -t lib/main.dart" command in terminal (without quote)
 
-void main() async {
+Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
@@ -23,6 +23,7 @@ void main() async {
     location: BannerLocation.topStart,
     color: Colors.blue,
     variables: {
+      'apiKey': 'USJF-YPJY-3VTF-QV8J',
       'apiBaseUrl': 'https://kontenation.com/wp-json/wp/v2',
       'appName': 'iniNews',
       'appPrimarySwatch': Colors.indigo,
