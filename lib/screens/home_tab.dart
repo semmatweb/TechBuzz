@@ -302,7 +302,7 @@ class _PostTabState extends State<PostTab> {
           },
         ),
         separatorBuilder: (context, index) {
-          if (index != 0 && index % 5 == 0) {
+          if (index == 5) {
             return FutureBuilder<Widget>(
               future: _getBannerAd(),
               builder: (context, snapshot) {

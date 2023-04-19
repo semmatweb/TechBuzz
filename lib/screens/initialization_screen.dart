@@ -1,15 +1,9 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:ini_news_flutter/screens/states/loading_state.dart';
-import 'package:ini_news_flutter/screens/states/failed_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../controllers/initialization_controller.dart';
 import '../screens/home_screen.dart';
 import '../screens/onboarding_screen.dart';
-import '../screens/states/error_state.dart';
 
 class InitializationScreen extends StatefulWidget {
   const InitializationScreen({super.key});
@@ -19,13 +13,9 @@ class InitializationScreen extends StatefulWidget {
 }
 
 class _InitializationScreenState extends State<InitializationScreen> {
-  Future<Response<void>?>? _getState;
-  final _controller = InitializationController();
-
   @override
   void initState() {
     super.initState();
-    _getState = _controller.getState();
     _initialization();
     _initGoogleMobileAds();
     _getIntroductionState();
@@ -59,59 +49,6 @@ class _InitializationScreenState extends State<InitializationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Response<void>?>(
-      future: _getState,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            appBar: AppBar(),
-            body: const LoadingState(),
-          );
-        }
-
-        if (!snapshot.hasData) {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            appBar: AppBar(),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Spacer(),
-                  FailedState(
-                    stateIcon: Icons.signal_wifi_connected_no_internet_4,
-                    stateText: 'No Internet Connection',
-                    onPressed: () {
-                      setState(() {
-                        _getState = _controller.getState();
-                      });
-                    },
-                  ),
-                  const Spacer(),
-                  Text(
-                    FlavorConfig.instance.variables['appName']
-                        .toString()
-                        .toUpperCase(),
-                    style: TextStyle(
-                      color: FlavorConfig.instance.variables['appGrey'],
-                      fontWeight: FontWeight.w700,
-                      fontSize: 20,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-          );
-        }
-
-        if (snapshot.hasError) {
-          return const ErrorState();
-        }
-
-        return isIntroduced ? const HomeScreen() : const OnboardingScreen();
-      },
-    );
+    return isIntroduced ? const HomeScreen() : const OnboardingScreen();
   }
 }

@@ -19,7 +19,7 @@ Future<void> main() async {
 
   MobileAds.instance.initialize();
   RequestConfiguration configuration =
-      RequestConfiguration(testDeviceIds: ["FF2331521FE919AD313B7F4F28F5E070"]);
+      RequestConfiguration(testDeviceIds: ["4BFC7E3DDBEE00DC8B4F10572FB39644"]);
   MobileAds.instance.updateRequestConfiguration(configuration);
 
   // App-wide Config
@@ -29,8 +29,7 @@ Future<void> main() async {
     location: BannerLocation.topStart,
     color: Colors.blue,
     variables: {
-      'licenseKey': 'BIRX-JMKC-GC37-8N7P',
-      'apiBaseUrl': 'https://kontenation.com/wp-json/wp/v2',
+      'apiBaseUrl': 'https://dummycontent.inito.dev/wp-json/wp/v2',
       'appName': 'iniNews',
       'appDefaultFont': 'Inter',
       'appPrimarySwatch': Colors.indigo,
