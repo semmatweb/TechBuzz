@@ -250,7 +250,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           );
         }
 
-        Widget? bannerAdWidget() {
+        Widget bannerAdWidget() {
           if (_bannerAd != null) {
             return Column(
               children: [
@@ -506,6 +506,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     },
                   ),
                   PostTag(postID: widget.postID),
+                  bannerAdWidget(),
                   RelatedPost(
                     categoryID: postDetailData.postTerms.first.id,
                     postKeyword: parsedPostTitleString.split('').first,
