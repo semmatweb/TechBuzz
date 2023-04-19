@@ -312,7 +312,6 @@ class _PostTabState extends State<PostTab> {
 
                 return Column(
                   children: [
-                    const SizedBox(height: 30),
                     snapshot.data!,
                     const SizedBox(height: 30),
                   ],

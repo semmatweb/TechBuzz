@@ -10,6 +10,8 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:html/parser.dart' show parse;
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../ad_helper.dart';
 import '../controllers/bookmark_controller.dart';
 import '../controllers/post_detail_controller.dart';
 import '../controllers/tag_controller.dart';
@@ -51,10 +53,12 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   void initState() {
     super.initState();
-    checkBookmarkData();
+    _checkBookmarkData();
+    _loadInterstitialAd();
+    Future.delayed(Duration.zero, _loadBannerAd);
   }
 
-  void checkBookmarkData() async {
+  void _checkBookmarkData() async {
     Database db = await bookmarkDatabase.db;
 
     final rawTitleString = parse(widget.postTitle);
@@ -80,6 +84,79 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         isBookmarkAlreadyExist = true;
       });
     }
+  }
+
+  InterstitialAd? _interstitialAd;
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          setState(() {
+            _interstitialAd = ad;
+          });
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              setState(() {
+                _interstitialAd = null;
+              });
+              ad.dispose();
+            },
+            onAdFailedToShowFullScreenContent: (ad, adError) {
+              setState(() {
+                _interstitialAd = null;
+              });
+              ad.dispose();
+            },
+          );
+        },
+        onAdFailedToLoad: (error) {
+          debugPrint('Failed to load interstitial ad: ${error.message}');
+          setState(() {
+            _interstitialAd = null;
+          });
+          _interstitialAd!.dispose();
+        },
+      ),
+    );
+  }
+
+  BannerAd? _bannerAd;
+
+  Future<void> _loadBannerAd() async {
+    final AnchoredAdaptiveBannerAdSize? adSize =
+        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+      MediaQuery.of(context).size.width.truncate(),
+    );
+
+    _bannerAd = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      size: adSize!,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _bannerAd = ad as BannerAd;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          setState(() {
+            _bannerAd = null;
+          });
+          debugPrint('Failed to load banner ad: ${error.message}');
+          ad.dispose();
+        },
+        onAdClosed: (ad) {
+          setState(() {
+            _bannerAd = null;
+          });
+          ad.dispose();
+        },
+      ),
+    );
+    return _bannerAd!.load();
   }
 
   @override
@@ -173,6 +250,25 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           );
         }
 
+        Widget? bannerAdWidget() {
+          if (_bannerAd != null) {
+            return Column(
+              children: [
+                const SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd!),
+                ),
+              ],
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
+        }
+
         return Scaffold(
           extendBodyBehindAppBar: true,
           extendBody: true,
@@ -203,7 +299,16 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 Icons.arrow_back,
                 color: Colors.white,
               ),
-              onPressed: () {
+              onPressed: () async {
+                if (_interstitialAd == null) {
+                  _loadInterstitialAd();
+                }
+
+                if (_interstitialAd != null) {
+                  await _interstitialAd!.show();
+                }
+
+                if (!mounted) return;
                 Navigator.of(context).pop();
               },
             ),
