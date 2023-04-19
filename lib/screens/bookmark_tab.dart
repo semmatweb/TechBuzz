@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
+import 'package:ini_news_flutter/screens/states/empty_state.dart';
+import 'package:ini_news_flutter/screens/states/loading_state.dart';
 import 'package:intl/intl.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sqflite/sqflite.dart';
 import '../controllers/bookmark_controller.dart';
 import '../databases/bookmark_database.dart';
@@ -24,12 +25,7 @@ class _BookmarkTabState extends State<BookmarkTab> {
       future: _controller.getBookmark(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: LoadingAnimationWidget.prograssiveDots(
-              color: Theme.of(context).primaryColor,
-              size: 50,
-            ),
-          );
+          return const LoadingState();
         }
 
         if (snapshot.hasData && snapshot.data!.isNotEmpty) {
@@ -91,18 +87,7 @@ class _BookmarkTabState extends State<BookmarkTab> {
             ),
           );
         } else {
-          return Center(
-            child: Text(
-              'NO\nBOOK\nMARK',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: FlavorConfig.instance.variables['appGrey'],
-                fontSize: 32,
-                fontWeight: FontWeight.w800,
-                height: 1,
-              ),
-            ),
-          );
+          return const EmptyState(stateText: 'NO\nBOOK\nMARK');
         }
       },
     );

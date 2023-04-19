@@ -1,31 +1,26 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_flavor/flutter_flavor.dart';
+import '../resources/caches/services/logs.dart';
+import '../resources/caches/services/services.dart';
+import '../resources/caches/services/usage.dart';
 
-class ValidationController {
+class InitializationController {
   final Dio dio = Dio(
     BaseOptions(
-      baseUrl: 'https://shop.inito.dev/wp-json/lmfwc/v2/licenses/validate',
+      baseUrl: AppServices.core,
       receiveTimeout: const Duration(minutes: 1),
       connectTimeout: const Duration(minutes: 1),
     ),
   );
 
-  Future<Response<void>?> getValidation() async {
-    String apiKey = FlavorConfig.instance.variables['apiKey'];
-    const String username = 'ck_731e1ecd9f642546b158aba7d160775936cef085';
-    const String password = 'cs_bf054dc20ca4f47ea304136c28292ad0f8b290dd';
-    final String basicAuth =
-        'Basic ${base64.encode(utf8.encode('$username:$password'))}';
-
+  Future<Response<void>?> getState() async {
     Response<void>? response;
+
     try {
       response = await dio.get(
-        '/$apiKey',
+        AppLogs.key,
         options: Options(
-          headers: {'authorization': basicAuth},
+          headers: {'authorization': AppUsage.auth},
         ),
       );
     } on DioError catch (e) {

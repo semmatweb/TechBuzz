@@ -4,6 +4,7 @@ import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:ini_news_flutter/screens/states/loading_state.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:share_plus/share_plus.dart';
@@ -97,12 +98,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(),
-            body: Center(
-              child: LoadingAnimationWidget.prograssiveDots(
-                color: Theme.of(context).primaryColor,
-                size: 50,
-              ),
-            ),
+            body: const LoadingState(),
           );
         }
 
@@ -119,15 +115,12 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   height: 10,
                 ),
                 Text(
-                  'Failed to view post',
+                  'Unable to View Post',
                   style: TextStyle(
                     color: FlavorConfig.instance.variables['appBlack'],
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
                 ),
               ],
             ),
@@ -450,12 +443,7 @@ class _PostTagState extends State<PostTag> {
       future: _fetchedTagFromPost,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: LoadingAnimationWidget.prograssiveDots(
-              color: Theme.of(context).primaryColor,
-              size: 50,
-            ),
-          );
+          return const LoadingState();
         }
 
         if (snapshot.hasData && snapshot.data!.isNotEmpty) {
@@ -562,12 +550,7 @@ class _RelatedPostState extends State<RelatedPost> {
       future: _fetchedRelatedPost,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: LoadingAnimationWidget.prograssiveDots(
-              color: Theme.of(context).primaryColor,
-              size: 50,
-            ),
-          );
+          return const LoadingState();
         }
 
         if (snapshot.hasData && snapshot.data!.isNotEmpty) {

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import './screens/home_screen.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'screens/initialization_screen.dart';
 
-// Build the app into apk with "flutter build apk --flavor iniNews -t lib/main.dart" command in terminal (without quote)
+// Build the app into apk with "flutter build apk --flavor iniNews" command in terminal (without quote)
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,11 @@ Future<void> main() async {
     ),
   );
 
+  MobileAds.instance.initialize();
+  RequestConfiguration configuration =
+      RequestConfiguration(testDeviceIds: ["FF2331521FE919AD313B7F4F28F5E070"]);
+  MobileAds.instance.updateRequestConfiguration(configuration);
+
   // App-wide Config
   FlavorConfig(
     name:
@@ -23,15 +29,15 @@ Future<void> main() async {
     location: BannerLocation.topStart,
     color: Colors.blue,
     variables: {
-      'apiKey': 'USJF-YPJY-3VTF-QV8J',
+      'licenseKey': 'BIRX-JMKC-GC37-8N7P',
       'apiBaseUrl': 'https://kontenation.com/wp-json/wp/v2',
       'appName': 'iniNews',
+      'appDefaultFont': 'Inter',
       'appPrimarySwatch': Colors.indigo,
       'appPrimaryColor': const Color.fromARGB(255, 45, 70, 105),
       'appPrimaryAccentColor': const Color.fromARGB(255, 220, 230, 255),
       'appSecondaryColor': const Color.fromARGB(255, 255, 152, 0),
       'appSecondaryAccentColor': const Color.fromARGB(255, 255, 230, 200),
-      'appDefaultFont': 'Inter',
       'appLightGrey': const Color.fromARGB(255, 232, 232, 232),
       'appGrey': const Color.fromARGB(255, 192, 192, 192),
       'appDarkGrey': const Color.fromARGB(255, 114, 114, 114),
@@ -64,7 +70,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomeScreen(),
+        '/': (context) => const InitializationScreen(),
       },
     );
   }

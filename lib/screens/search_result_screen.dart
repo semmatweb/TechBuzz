@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:ini_news_flutter/screens/states/empty_state.dart';
+import 'package:ini_news_flutter/screens/states/loading_state.dart';
+import 'package:ini_news_flutter/screens/states/failed_state.dart';
+import 'package:ini_news_flutter/screens/states/refresh_state.dart';
 import 'package:intl/intl.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:html/parser.dart' show parse;
 import '../controllers/search_controller.dart';
 import '../models/post_model.dart';
@@ -69,113 +72,29 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
           padding: const EdgeInsets.all(24),
           builderDelegate: PagedChildBuilderDelegate<Post>(
             firstPageProgressIndicatorBuilder: (context) {
-              return Center(
-                child: LoadingAnimationWidget.prograssiveDots(
-                  color: Theme.of(context).primaryColor,
-                  size: 50,
-                ),
-              );
+              return const LoadingState();
             },
             firstPageErrorIndicatorBuilder: (context) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Failed to fetch post',
-                      style: TextStyle(
-                        color: FlavorConfig.instance.variables['appBlack'],
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        searchPagingController.refresh();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: FlavorConfig
-                            .instance.variables['appPrimaryAccentColor'],
-                        elevation: 0,
-                        surfaceTintColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                      ),
-                      icon: Icon(
-                        Icons.refresh,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      label: Text(
-                        'Retry',
-                        style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              return FailedState(
+                stateIcon: Icons.error,
+                stateText: 'Failed Retrieving Post',
+                onPressed: () {
+                  searchPagingController.refresh();
+                },
               );
             },
             newPageProgressIndicatorBuilder: (context) {
-              return Center(
-                child: LoadingAnimationWidget.prograssiveDots(
-                  color: Theme.of(context).primaryColor,
-                  size: 50,
-                ),
-              );
+              return const LoadingState();
             },
             newPageErrorIndicatorBuilder: (context) {
-              return Center(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    searchPagingController.refresh();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: FlavorConfig
-                        .instance.variables['appPrimaryAccentColor'],
-                    elevation: 0,
-                    surfaceTintColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                  ),
-                  icon: Icon(
-                    Icons.refresh,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  label: Text(
-                    'Retry',
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
+              return RefreshState(
+                onPressed: () {
+                  searchPagingController.refresh();
+                },
               );
             },
             noItemsFoundIndicatorBuilder: (context) {
-              return Center(
-                child: Text(
-                  'RESULT\nNOT\nFOUND',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: FlavorConfig.instance.variables['appGrey'],
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                    height: 1,
-                  ),
-                ),
-              );
+              return const EmptyState(stateText: 'RESULT\nNOT\nFOUND');
             },
             animateTransitions: true,
             itemBuilder: (context, postData, index) {

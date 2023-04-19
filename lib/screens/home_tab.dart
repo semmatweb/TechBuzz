@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:ini_news_flutter/screens/states/empty_state.dart';
+import 'package:ini_news_flutter/screens/states/loading_state.dart';
+import 'package:ini_news_flutter/screens/states/failed_state.dart';
+import 'package:ini_news_flutter/screens/states/refresh_state.dart';
 import 'package:intl/intl.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:html/parser.dart' show parse;
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../ad_helper.dart';
 import '../controllers/post_controller.dart';
 import '../models/menu_model.dart';
 import '../models/post_model.dart';
@@ -71,65 +76,18 @@ class _HomeTabState extends State<HomeTab> {
       future: _fetchedMenu,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: LoadingAnimationWidget.prograssiveDots(
-              color: Theme.of(context).primaryColor,
-              size: 50,
-            ),
-          );
+          return const LoadingState();
         }
 
         if (!snapshot.hasData || snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.error,
-                  color: Colors.red,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  'Failed to fetch post',
-                  style: TextStyle(
-                    color: FlavorConfig.instance.variables['appBlack'],
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _fetchedMenu = _controller.getAllMenu();
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: FlavorConfig
-                        .instance.variables['appPrimaryAccentColor'],
-                    elevation: 0,
-                    surfaceTintColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                  ),
-                  icon: Icon(
-                    Icons.refresh,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  label: Text(
-                    'Retry',
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          return FailedState(
+            stateIcon: Icons.error,
+            stateText: 'Failed Retrieving Post',
+            onPressed: () {
+              setState(() {
+                _fetchedMenu = _controller.getAllMenu();
+              });
+            },
           );
         }
 
@@ -197,19 +155,66 @@ class _HomeTabState extends State<HomeTab> {
   }
 }
 
-class PostTab extends StatelessWidget {
+class PostTab extends StatefulWidget {
   const PostTab({super.key, required this.pagingController});
 
   final PagingController<int, Post> pagingController;
 
   @override
+  State<PostTab> createState() => _PostTabState();
+}
+
+class _PostTabState extends State<PostTab> {
+  Future<Widget> _getBannerAd() async {
+    final AnchoredAdaptiveBannerAdSize? adSize =
+        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+      MediaQuery.of(context).size.width.truncate(),
+    );
+
+    BannerAd? bannerAd;
+
+    bannerAd = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      size: adSize!,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            bannerAd = ad as BannerAd;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          setState(() {
+            bannerAd = null;
+          });
+          debugPrint('Failed to load banner ad: ${error.message}');
+          ad.dispose();
+        },
+        onAdClosed: (ad) {
+          setState(() {
+            bannerAd = null;
+          });
+          ad.dispose();
+        },
+      ),
+    );
+    await bannerAd!.load();
+
+    return SizedBox(
+      width: double.infinity,
+      height: bannerAd!.size.height.toDouble(),
+      child: AdWidget(ad: bannerAd!),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: () => Future.sync(() => pagingController.refresh()),
+      onRefresh: () => Future.sync(() => widget.pagingController.refresh()),
       color: Theme.of(context).primaryColor,
       backgroundColor: Colors.white,
       child: PagedListView<int, Post>.separated(
-        pagingController: pagingController,
+        pagingController: widget.pagingController,
         physics: const BouncingScrollPhysics(
           parent: AlwaysScrollableScrollPhysics(),
         ),
@@ -218,113 +223,29 @@ class PostTab extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         builderDelegate: PagedChildBuilderDelegate<Post>(
           firstPageProgressIndicatorBuilder: (context) {
-            return Center(
-              child: LoadingAnimationWidget.prograssiveDots(
-                color: Theme.of(context).primaryColor,
-                size: 50,
-              ),
-            );
+            return const LoadingState();
           },
           firstPageErrorIndicatorBuilder: (context) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error,
-                    color: Colors.red,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Failed to fetch post',
-                    style: TextStyle(
-                      color: FlavorConfig.instance.variables['appBlack'],
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      pagingController.refresh();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: FlavorConfig
-                          .instance.variables['appPrimaryAccentColor'],
-                      elevation: 0,
-                      surfaceTintColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                    ),
-                    icon: Icon(
-                      Icons.refresh,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    label: Text(
-                      'Retry',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            return FailedState(
+              stateIcon: Icons.error,
+              stateText: 'Failed Retrieving Post',
+              onPressed: () {
+                widget.pagingController.refresh();
+              },
             );
           },
           newPageProgressIndicatorBuilder: (context) {
-            return Center(
-              child: LoadingAnimationWidget.prograssiveDots(
-                color: Theme.of(context).primaryColor,
-                size: 50,
-              ),
-            );
+            return const LoadingState();
           },
           newPageErrorIndicatorBuilder: (context) {
-            return Center(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  pagingController.refresh();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      FlavorConfig.instance.variables['appPrimaryAccentColor'],
-                  elevation: 0,
-                  surfaceTintColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                ),
-                icon: Icon(
-                  Icons.refresh,
-                  color: Theme.of(context).primaryColor,
-                ),
-                label: Text(
-                  'Retry',
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
+            return RefreshState(
+              onPressed: () {
+                widget.pagingController.refresh();
+              },
             );
           },
           noItemsFoundIndicatorBuilder: (context) {
-            return Center(
-              child: Text(
-                'NO\nPOST',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: FlavorConfig.instance.variables['appGrey'],
-                  fontSize: 32,
-                  fontWeight: FontWeight.w800,
-                  height: 1,
-                ),
-              ),
-            );
+            return const EmptyState(stateText: 'NO\nPOST');
           },
           animateTransitions: true,
           itemBuilder: (context, postData, index) {
@@ -334,7 +255,7 @@ class PostTab extends StatelessWidget {
 
             return Column(
               children: [
-                if (postData == pagingController.itemList!.first)
+                if (postData == widget.pagingController.itemList!.first)
                   FeaturedPostItem(
                     onTap: () {
                       Navigator.of(context).push(
@@ -355,7 +276,7 @@ class PostTab extends StatelessWidget {
                     postCategory: postData.postTerms.first.name,
                     postImageUrl: postData.featuredImageSrc.large,
                   ),
-                if (postData != pagingController.itemList!.first)
+                if (postData != widget.pagingController.itemList!.first)
                   PostItem(
                     onTap: () {
                       Navigator.of(context).push(
@@ -380,7 +301,28 @@ class PostTab extends StatelessWidget {
             );
           },
         ),
-        separatorBuilder: (context, index) => const SizedBox(height: 30),
+        separatorBuilder: (context, index) {
+          if (index != 0 && index % 5 == 0) {
+            return FutureBuilder<Widget>(
+              future: _getBannerAd(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData || snapshot.hasError) {
+                  return const SizedBox(height: 30);
+                }
+
+                return Column(
+                  children: [
+                    const SizedBox(height: 30),
+                    snapshot.data!,
+                    const SizedBox(height: 30),
+                  ],
+                );
+              },
+            );
+          } else {
+            return const SizedBox(height: 30);
+          }
+        },
       ),
     );
   }
