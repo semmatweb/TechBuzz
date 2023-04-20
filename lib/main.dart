@@ -5,8 +5,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'screens/initialization_screen.dart';
 
-// Build the app into apk with "flutter build apk --flavor iniNews" command in terminal (without quote)
-
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -24,18 +22,14 @@ Future<void> main() async {
 
   // App-wide Config
   FlavorConfig(
-    name:
-        'iniNews', // IMPORTANT!!! only change this "name:" variable if you renamed the productFlavors at android/app/build.gradle
-    location: BannerLocation.topStart,
-    color: Colors.blue,
     variables: {
       'apiBaseUrl': 'https://dummycontent.inito.dev/wp-json/wp/v2',
       'appName': 'iniNews',
       'appDefaultFont': 'Inter',
       'appPrimarySwatch': Colors.indigo,
-      'appPrimaryColor': const Color.fromARGB(255, 45, 70, 105),
-      'appPrimaryAccentColor': const Color.fromARGB(255, 220, 230, 255),
-      'appSecondaryColor': const Color.fromARGB(255, 255, 152, 0),
+      'appPrimaryColor': const Color.fromARGB(255, 60, 95, 150),
+      'appPrimaryAccentColor': const Color.fromARGB(255, 220, 230, 240),
+      'appSecondaryColor': const Color.fromARGB(255, 255, 150, 40),
       'appSecondaryAccentColor': const Color.fromARGB(255, 255, 230, 200),
       'appLightGrey': const Color.fromARGB(255, 232, 232, 232),
       'appGrey': const Color.fromARGB(255, 192, 192, 192),

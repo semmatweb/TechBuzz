@@ -50,12 +50,14 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   BookmarkDBManager bookmarkDatabase = BookmarkDBManager.instance;
   bool isBookmarkAlreadyExist = false;
 
+  Future<PostDetail?>? _fetchedPostDetail;
+
   @override
   void initState() {
     super.initState();
     _checkBookmarkData();
     _loadInterstitialAd();
-    Future.delayed(Duration.zero, _loadBannerAd);
+    _fetchedPostDetail = _controller.getPostDetail(widget.postID);
   }
 
   void _checkBookmarkData() async {
@@ -94,30 +96,23 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
-          setState(() {
-            _interstitialAd = ad;
-          });
+          _interstitialAd = ad;
           ad.fullScreenContentCallback = FullScreenContentCallback(
             onAdDismissedFullScreenContent: (ad) {
-              setState(() {
-                _interstitialAd = null;
-              });
+              _interstitialAd = null;
               ad.dispose();
             },
             onAdFailedToShowFullScreenContent: (ad, adError) {
-              setState(() {
-                _interstitialAd = null;
-              });
+              _interstitialAd = null;
               ad.dispose();
             },
           );
         },
         onAdFailedToLoad: (error) {
           debugPrint('Failed to load interstitial ad: ${error.message}');
-          setState(() {
-            _interstitialAd = null;
-          });
+          _interstitialAd = null;
           _interstitialAd!.dispose();
+          _loadInterstitialAd();
         },
       ),
     );
@@ -125,10 +120,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   BannerAd? _bannerAd;
 
-  Future<void> _loadBannerAd() async {
+  Future<Widget> _getBannerAd() async {
     final AnchoredAdaptiveBannerAdSize? adSize =
         await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-      MediaQuery.of(context).size.width.truncate(),
+      MediaQuery.of(context).size.width.truncate() - 40,
     );
 
     _bannerAd = BannerAd(
@@ -137,26 +132,28 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (ad) {
-          setState(() {
-            _bannerAd = ad as BannerAd;
-          });
+          _bannerAd = ad as BannerAd;
         },
         onAdFailedToLoad: (ad, error) {
-          setState(() {
-            _bannerAd = null;
-          });
+          _bannerAd = null;
+
           debugPrint('Failed to load banner ad: ${error.message}');
           ad.dispose();
         },
         onAdClosed: (ad) {
-          setState(() {
-            _bannerAd = null;
-          });
+          _bannerAd = null;
+
           ad.dispose();
         },
       ),
     );
-    return _bannerAd!.load();
+    await _bannerAd!.load();
+
+    return SizedBox(
+      width: _bannerAd!.size.width.toDouble(),
+      height: _bannerAd!.size.height.toDouble(),
+      child: AdWidget(ad: _bannerAd!),
+    );
   }
 
   @override
@@ -169,7 +166,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     );
 
     return FutureBuilder<PostDetail?>(
-      future: _controller.getPostDetail(widget.postID),
+      future: _fetchedPostDetail,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
@@ -228,6 +225,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             const SnackBar(
               content: Text('Post bookmarked.'),
               backgroundColor: Colors.black,
+              duration: Duration(seconds: 2),
             ),
           );
         }
@@ -246,280 +244,304 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             const SnackBar(
               content: Text('Post removed from bookmark.'),
               backgroundColor: Colors.black,
+              duration: Duration(seconds: 2),
             ),
           );
         }
 
-        Widget bannerAdWidget() {
-          if (_bannerAd != null) {
-            return Column(
-              children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  height: _bannerAd!.size.height.toDouble(),
-                  child: AdWidget(ad: _bannerAd!),
-                ),
-              ],
+        return WillPopScope(
+          onWillPop: () async {
+            if (_interstitialAd == null) {
+              _loadInterstitialAd();
+            }
+
+            if (_interstitialAd != null) {
+              await _interstitialAd!.show();
+            }
+
+            Future.delayed(
+              Duration.zero,
+              () => Navigator.of(context).popUntil(ModalRoute.withName('/')),
             );
-          } else {
-            return const SizedBox.shrink();
-          }
-        }
 
-        return Scaffold(
-          extendBodyBehindAppBar: true,
-          extendBody: true,
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            systemOverlayStyle: SystemUiOverlayStyle.light,
-            automaticallyImplyLeading: false,
-            backgroundColor: Colors.transparent,
-            surfaceTintColor: Theme.of(context).primaryColor,
-            elevation: 0,
-            toolbarHeight: 0,
-          ),
-          body: DraggableHome(
+            return true;
+          },
+          child: Scaffold(
+            extendBodyBehindAppBar: true,
+            extendBody: true,
             backgroundColor: Colors.white,
-            title: Text(
-              FlavorConfig.instance.variables['appName']
-                  .toString()
-                  .toUpperCase(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w900,
-                fontSize: 20,
-                height: 1,
-              ),
+            appBar: AppBar(
+              systemOverlayStyle: SystemUiOverlayStyle.light,
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.transparent,
+              surfaceTintColor: Theme.of(context).primaryColor,
+              elevation: 0,
+              toolbarHeight: 0,
             ),
-            leading: IconButton(
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
+            body: DraggableHome(
+              backgroundColor: Colors.white,
+              title: Text(
+                FlavorConfig.instance.variables['appName']
+                    .toString()
+                    .toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 20,
+                  height: 1,
+                ),
               ),
-              onPressed: () async {
-                if (_interstitialAd == null) {
-                  _loadInterstitialAd();
-                }
+              leading: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                ),
+                onPressed: () async {
+                  if (_interstitialAd == null) {
+                    _loadInterstitialAd();
+                  }
 
-                if (_interstitialAd != null) {
-                  await _interstitialAd!.show();
-                }
+                  if (_interstitialAd != null) {
+                    await _interstitialAd!.show();
+                  }
 
-                if (!mounted) return;
-                Navigator.of(context).pop();
-              },
-            ),
-            alwaysShowLeadingAndAction: true,
-            appBarColor: Theme.of(context).primaryColor,
-            headerExpandedHeight: 0.2,
-            headerWidget: CachedNetworkImage(
-              imageUrl: postDetailData.featuredImageSrc.large,
-              color: Colors.black.withOpacity(0.5),
-              colorBlendMode: BlendMode.darken,
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.width / 1.5,
-              fit: BoxFit.cover,
-              progressIndicatorBuilder: (context, url, downloadProgress) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.width / 1.5,
-                  color: FlavorConfig.instance.variables['appLightGrey'],
-                  child: Center(
-                    child: LoadingAnimationWidget.prograssiveDots(
-                      color: FlavorConfig.instance.variables['appGrey'],
-                      size: 50,
+                  if (!mounted) return;
+                  Navigator.of(context).popUntil(ModalRoute.withName('/'));
+                },
+              ),
+              alwaysShowLeadingAndAction: true,
+              appBarColor: Theme.of(context).primaryColor,
+              headerExpandedHeight: 0.2,
+              headerWidget: CachedNetworkImage(
+                imageUrl: postDetailData.featuredImageSrc.large,
+                color: Colors.black.withOpacity(0.5),
+                colorBlendMode: BlendMode.darken,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.width / 1.5,
+                fit: BoxFit.cover,
+                progressIndicatorBuilder: (context, url, downloadProgress) {
+                  return Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.width / 1.5,
+                    color: FlavorConfig.instance.variables['appLightGrey'],
+                    child: Center(
+                      child: LoadingAnimationWidget.prograssiveDots(
+                        color: FlavorConfig.instance.variables['appGrey'],
+                        size: 50,
+                      ),
                     ),
-                  ),
-                );
-              },
-              errorWidget: (context, url, error) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.width / 1.5,
-                  color: FlavorConfig.instance.variables['appLightGrey'],
-                  child: const Center(
-                    child: Icon(Icons.error, size: 50),
-                  ),
-                );
-              },
-            ),
-            body: [
-              ListView(
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                shrinkWrap: true,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => CategoryDetailScreen(
-                                categoryID: postDetailData.postTerms.first.id,
-                                categoryName:
-                                    postDetailData.postTerms.first.name,
+                  );
+                },
+                errorWidget: (context, url, error) {
+                  return Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.width / 1.5,
+                    color: FlavorConfig.instance.variables['appLightGrey'],
+                    child: const Center(
+                      child: Icon(Icons.error, size: 50),
+                    ),
+                  );
+                },
+              ),
+              body: [
+                ListView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  shrinkWrap: true,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => CategoryDetailScreen(
+                                  categoryID: postDetailData.postTerms.first.id,
+                                  categoryName:
+                                      postDetailData.postTerms.first.name,
+                                ),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: FlavorConfig
+                                .instance.variables['appSecondaryAccentColor'],
+                            elevation: 0,
+                            surfaceTintColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            maximumSize: Size(
+                              MediaQuery.of(context).size.width / 2,
+                              40,
+                            ),
+                          ),
+                          child: Text(
+                            postDetailData.postTerms.first.name,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        ElevatedButton(
+                          onPressed: () {
+                            Share.share(postDetailData.link);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                FlavorConfig.instance.variables['appLightGrey'],
+                            elevation: 0,
+                            surfaceTintColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                          ),
+                          child: Icon(
+                            Icons.shortcut,
+                            color: FlavorConfig.instance.variables['appGrey'],
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (isBookmarkAlreadyExist == false) {
+                              bookmarkPost();
+                            } else {
+                              unbookmarkPost();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isBookmarkAlreadyExist
+                                ? FlavorConfig
+                                    .instance.variables['appPrimaryAccentColor']
+                                : FlavorConfig
+                                    .instance.variables['appLightGrey'],
+                            elevation: 0,
+                            surfaceTintColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                          ),
+                          child: Icon(
+                            isBookmarkAlreadyExist
+                                ? Icons.bookmark
+                                : Icons.bookmark_add_outlined,
+                            color: isBookmarkAlreadyExist
+                                ? Theme.of(context).primaryColor
+                                : FlavorConfig.instance.variables['appGrey'],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      parsedPostTitleString,
+                      style: TextStyle(
+                        color: FlavorConfig.instance.variables['appBlack'],
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'by ',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color:
+                                    FlavorConfig.instance.variables['appBlack'],
                               ),
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: FlavorConfig
-                              .instance.variables['appSecondaryAccentColor'],
-                          elevation: 0,
-                          surfaceTintColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          maximumSize: Size(
-                            MediaQuery.of(context).size.width / 2,
-                            40,
-                          ),
+                            Text(
+                              postDetailData.authorDetails.displayName,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color:
+                                    FlavorConfig.instance.variables['appBlack'],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                        child: Text(
-                          postDetailData.postTerms.first.name,
-                          overflow: TextOverflow.ellipsis,
+                        Text(
+                          DateFormat('EEE, dd MMMM y')
+                              .format(postDetailData.date),
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontWeight: FontWeight.w600,
                             fontSize: 14,
+                            color: FlavorConfig.instance.variables['appBlack'],
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
-                      const Spacer(),
-                      ElevatedButton(
-                        onPressed: () {
-                          Share.share(postDetailData.link);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              FlavorConfig.instance.variables['appLightGrey'],
-                          elevation: 0,
-                          surfaceTintColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                        ),
-                        child: Icon(
-                          Icons.shortcut,
-                          color: FlavorConfig.instance.variables['appGrey'],
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (isBookmarkAlreadyExist == false) {
-                            bookmarkPost();
-                          } else {
-                            unbookmarkPost();
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isBookmarkAlreadyExist
-                              ? FlavorConfig
-                                  .instance.variables['appPrimaryAccentColor']
-                              : FlavorConfig.instance.variables['appLightGrey'],
-                          elevation: 0,
-                          surfaceTintColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                        ),
-                        child: Icon(
-                          isBookmarkAlreadyExist
-                              ? Icons.bookmark
-                              : Icons.bookmark_add_outlined,
-                          color: isBookmarkAlreadyExist
-                              ? Theme.of(context).primaryColor
-                              : FlavorConfig.instance.variables['appGrey'],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    parsedPostTitleString,
-                    style: TextStyle(
-                      color: FlavorConfig.instance.variables['appBlack'],
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'by ',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color:
-                                  FlavorConfig.instance.variables['appBlack'],
+                    const SizedBox(height: 20),
+                    Divider(
+                      color: FlavorConfig.instance.variables['appLightGrey'],
+                      thickness: 2,
+                    ),
+                    const SizedBox(height: 20),
+                    HtmlWidget(
+                      postDetailData.content.rendered,
+                      textStyle: TextStyle(
+                        color: FlavorConfig.instance.variables['appBlack'],
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      enableCaching: true,
+                      onTapImage: (imageMetadata) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ImageDetailScreen(
+                              imageUrl: imageMetadata.sources.first.url,
                             ),
                           ),
-                          Text(
-                            postDetailData.authorDetails.displayName,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color:
-                                  FlavorConfig.instance.variables['appBlack'],
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        DateFormat('EEE, dd MMMM y')
-                            .format(postDetailData.date),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: FlavorConfig.instance.variables['appBlack'],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Divider(
-                    color: FlavorConfig.instance.variables['appLightGrey'],
-                    thickness: 2,
-                  ),
-                  const SizedBox(height: 20),
-                  HtmlWidget(
-                    postDetailData.content.rendered,
-                    textStyle: TextStyle(
-                      color: FlavorConfig.instance.variables['appBlack'],
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                        );
+                      },
                     ),
-                    enableCaching: true,
-                    onTapImage: (imageMetadata) {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ImageDetailScreen(
-                            imageUrl: imageMetadata.sources.first.url,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  PostTag(postID: widget.postID),
-                  bannerAdWidget(),
-                  RelatedPost(
-                    categoryID: postDetailData.postTerms.first.id,
-                    postKeyword: parsedPostTitleString.split('').first,
-                    excludePostID: postDetailData.id,
-                  ),
-                  const SizedBox(height: 30),
-                ],
-              ),
-            ],
+                    PostTag(postID: widget.postID),
+                    FutureBuilder<Widget>(
+                      future: _getBannerAd(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData || snapshot.hasError) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 20),
+                            snapshot.data!,
+                          ],
+                        );
+                      },
+                    ),
+                    RelatedPost(
+                      categoryID: postDetailData.postTerms.first.id,
+                      postKeyword: parsedPostTitleString.split('').first,
+                      excludePostID: postDetailData.id,
+                    ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _interstitialAd?.dispose();
+    _bannerAd?.dispose();
   }
 }
 

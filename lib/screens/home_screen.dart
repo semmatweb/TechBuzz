@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
             FlavorConfig.instance.variables['appPrimaryAccentColor'],
         tabShadow: const [BoxShadow(color: Colors.transparent)],
         tabMargin: const EdgeInsets.symmetric(vertical: 20),
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         curve: Curves.easeInCirc,
         tabs: [
@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
           GButton(
             icon: Icons.dashboard,
             iconActiveColor: Theme.of(context).primaryColor,
-            text: 'Kategori',
+            text: 'Category',
           ),
           GButton(
             icon: Icons.bookmark,

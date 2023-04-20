@@ -165,46 +165,51 @@ class PostTab extends StatefulWidget {
 }
 
 class _PostTabState extends State<PostTab> {
+  BannerAd? _bannerAd;
+
   Future<Widget> _getBannerAd() async {
     final AnchoredAdaptiveBannerAdSize? adSize =
         await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-      MediaQuery.of(context).size.width.truncate(),
+      MediaQuery.of(context).size.width.truncate() - 40,
     );
 
-    BannerAd? bannerAd;
-
-    bannerAd = BannerAd(
+    _bannerAd = BannerAd(
       adUnitId: AdHelper.bannerAdUnitId,
       size: adSize!,
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           setState(() {
-            bannerAd = ad as BannerAd;
+            _bannerAd = ad as BannerAd;
           });
         },
         onAdFailedToLoad: (ad, error) {
           setState(() {
-            bannerAd = null;
+            _bannerAd = null;
           });
           debugPrint('Failed to load banner ad: ${error.message}');
           ad.dispose();
         },
         onAdClosed: (ad) {
           setState(() {
-            bannerAd = null;
+            _bannerAd = null;
           });
           ad.dispose();
         },
       ),
     );
-    await bannerAd!.load();
+    await _bannerAd!.load();
 
     return SizedBox(
-      width: double.infinity,
-      height: bannerAd!.size.height.toDouble(),
-      child: AdWidget(ad: bannerAd!),
+      width: _bannerAd!.size.width.toDouble(),
+      height: _bannerAd!.size.height.toDouble(),
+      child: AdWidget(ad: _bannerAd!),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -311,7 +316,9 @@ class _PostTabState extends State<PostTab> {
                 }
 
                 return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    const SizedBox(height: 30),
                     snapshot.data!,
                     const SizedBox(height: 30),
                   ],
@@ -324,5 +331,11 @@ class _PostTabState extends State<PostTab> {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
   }
 }

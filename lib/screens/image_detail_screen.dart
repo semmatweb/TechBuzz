@@ -68,6 +68,7 @@ class ImageDetailScreen extends StatelessWidget {
                 const SnackBar(
                   content: Text('Saved to Gallery'),
                   backgroundColor: Colors.black,
+                  duration: Duration(seconds: 2),
                 ),
               );
             },

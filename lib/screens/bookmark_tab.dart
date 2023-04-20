@@ -62,6 +62,16 @@ class _BookmarkTabState extends State<BookmarkTab> {
 
                   await db.delete("post_bookmark",
                       where: "id = ${bookmarkData['id']}");
+
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Post removed from bookmark.'),
+                      backgroundColor: Colors.black,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+
                   setState(() {});
                 },
                 bookmarkPostTitle: bookmarkData['post_title'],
