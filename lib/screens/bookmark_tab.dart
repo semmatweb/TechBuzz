@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:sqflite/sqflite.dart';
 import '../controllers/bookmark_controller.dart';
 import '../databases/bookmark_database.dart';
@@ -37,6 +38,15 @@ class _BookmarkTabState extends State<BookmarkTab> {
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
               Map<String, dynamic> bookmarkData = snapshot.data![index];
+
+              final isToday = DateTime(
+                DateTime.now().year,
+                DateTime.now().month,
+                DateTime.now().day,
+              );
+
+              final parsedDateTime =
+                  DateTime.parse(bookmarkData['post_datetime']);
 
               return BookmarkPostItem(
                 onTap: () {
@@ -76,8 +86,9 @@ class _BookmarkTabState extends State<BookmarkTab> {
                 },
                 bookmarkPostTitle: bookmarkData['post_title'],
                 bookmarkPostCategory: bookmarkData['post_category'],
-                bookmarkPostDateTime: DateFormat('dd/MM/y | H:mm')
-                    .format(DateTime.parse(bookmarkData['post_datetime'])),
+                bookmarkPostDateTime: parsedDateTime == isToday
+                    ? timeago.format(parsedDateTime)
+                    : DateFormat('dd MMMM y').format(parsedDateTime),
                 bookmarkPostImageUrl: bookmarkData['post_imageurl'],
               );
             },

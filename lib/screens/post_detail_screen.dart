@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sqflite/sqflite.dart';
@@ -745,6 +746,12 @@ class _RelatedPostState extends State<RelatedPost> {
                   final String parsedTitleString =
                       parse(rawTitleString.body!.text).documentElement!.text;
 
+                  final isToday = DateTime(
+                    DateTime.now().year,
+                    DateTime.now().month,
+                    DateTime.now().day,
+                  );
+
                   return PostItem(
                     onTap: () {
                       Navigator.of(context).push(
@@ -760,8 +767,9 @@ class _RelatedPostState extends State<RelatedPost> {
                       );
                     },
                     postTitle: parsedTitleString,
-                    postDateTime:
-                        DateFormat('dd/MM/y | H:mm').format(postData.date),
+                    postDateTime: postData.date == isToday
+                        ? timeago.format(postData.date)
+                        : DateFormat('dd MMMM y').format(postData.date),
                     postCategory: postData.postTerms.first.name,
                     postImageUrl: postData.featuredImageSrc.medium,
                   );

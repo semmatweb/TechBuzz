@@ -66,12 +66,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 searchTextEditingController.clear();
               },
               textController: searchTextEditingController,
+              color: FlavorConfig.instance.variables['appPrimaryAccentColor'],
               boxShadow: false,
               prefixIcon: Icon(
                 Icons.search,
                 color: Theme.of(context).primaryColor,
               ),
-              textFieldIconColor: FlavorConfig.instance.variables['appBlack'],
+              suffixIcon: Icon(
+                Icons.close,
+                color: Theme.of(context).primaryColor,
+              ),
             ),
           )
         ],
