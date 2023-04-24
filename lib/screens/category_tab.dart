@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:intl/intl.dart';
 import '../controllers/category_controller.dart';
 import '../models/category_model.dart';
@@ -70,7 +71,7 @@ class _CategoryTabState extends State<CategoryTab> {
               Random().nextInt(256) + 128,
             );
             var foregroundColor = backgroundColor.computeLuminance() > 0.5
-                ? Colors.black
+                ? FlavorConfig.instance.variables['appBlack']
                 : Colors.white;
 
             return InkWell(
