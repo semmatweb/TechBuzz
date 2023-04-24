@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:ini_news_flutter/screens/states/empty_state.dart';
-import 'package:ini_news_flutter/screens/states/loading_state.dart';
-import 'package:ini_news_flutter/screens/states/failed_state.dart';
-import 'package:ini_news_flutter/screens/states/refresh_state.dart';
 import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:html/parser.dart' show parse;
 import '../controllers/search_controller.dart';
 import '../models/post_model.dart';
 import '../screens/post_detail_screen.dart';
+import '../screens/states/empty_state.dart';
+import '../screens/states/failed_state.dart';
+import '../screens/states/loading_state.dart';
+import '../screens/states/refresh_state.dart';
 import '../widgets/post_item_card.dart';
 
 class SearchResultScreen extends StatefulWidget {
@@ -75,12 +76,17 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
               return const LoadingState();
             },
             firstPageErrorIndicatorBuilder: (context) {
-              return FailedState(
-                stateIcon: Icons.error,
-                stateText: 'Failed Retrieving Post',
-                onPressed: () {
-                  searchPagingController.refresh();
-                },
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FailedState(
+                    stateIcon: Icons.error,
+                    stateText: 'Failed Retrieving Post',
+                    onPressed: () {
+                      searchPagingController.refresh();
+                    },
+                  ),
+                ],
               );
             },
             newPageProgressIndicatorBuilder: (context) {
@@ -102,6 +108,12 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
               final String parsedTitleString =
                   parse(rawTitleString.body!.text).documentElement!.text;
 
+              final isToday = DateTime(
+                DateTime.now().year,
+                DateTime.now().month,
+                DateTime.now().day,
+              );
+
               return Column(
                 children: [
                   PostItem(
@@ -119,8 +131,9 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                       );
                     },
                     postTitle: parsedTitleString,
-                    postDateTime:
-                        DateFormat('dd/MM/y | H:mm').format(postData.date),
+                    postDateTime: postData.date == isToday
+                        ? timeago.format(postData.date)
+                        : DateFormat('dd MMMM y').format(postData.date),
                     postCategory: postData.postTerms.first.name,
                     postImageUrl: postData.featuredImageSrc.medium,
                   ),

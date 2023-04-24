@@ -4,13 +4,13 @@ import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:ini_news_flutter/screens/states/loading_state.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter_web_browser/flutter_web_browser.dart';
 import '../ad_helper.dart';
 import '../controllers/bookmark_controller.dart';
 import '../controllers/post_detail_controller.dart';
@@ -22,6 +22,7 @@ import '../models/tag_model.dart';
 import '../screens/category_detail_screen.dart';
 import '../screens/image_detail_screen.dart';
 import '../screens/tag_detail_screen.dart';
+import '../screens/states/loading_state.dart';
 import '../widgets/post_item_card.dart';
 
 class PostDetailScreen extends StatefulWidget {
@@ -57,6 +58,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     super.initState();
     _checkBookmarkData();
     _loadInterstitialAd();
+    Future.delayed(Duration.zero, _loadBannerAd);
     _fetchedPostDetail = _controller.getPostDetail(widget.postID);
   }
 
@@ -97,20 +99,25 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
           _interstitialAd = ad;
+
           ad.fullScreenContentCallback = FullScreenContentCallback(
             onAdDismissedFullScreenContent: (ad) {
               _interstitialAd = null;
+
               ad.dispose();
             },
             onAdFailedToShowFullScreenContent: (ad, adError) {
               _interstitialAd = null;
+
               ad.dispose();
             },
           );
         },
         onAdFailedToLoad: (error) {
           debugPrint('Failed to load interstitial ad: ${error.message}');
+
           _interstitialAd = null;
+
           _interstitialAd!.dispose();
           _loadInterstitialAd();
         },
@@ -120,7 +127,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   BannerAd? _bannerAd;
 
-  Future<Widget> _getBannerAd() async {
+  Future<void> _loadBannerAd() async {
     final AnchoredAdaptiveBannerAdSize? adSize =
         await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
       MediaQuery.of(context).size.width.truncate() - 40,
@@ -132,28 +139,28 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (ad) {
-          _bannerAd = ad as BannerAd;
+          setState(() {
+            _bannerAd = ad as BannerAd;
+          });
         },
         onAdFailedToLoad: (ad, error) {
-          _bannerAd = null;
+          setState(() {
+            _bannerAd = null;
+          });
 
           debugPrint('Failed to load banner ad: ${error.message}');
           ad.dispose();
         },
         onAdClosed: (ad) {
-          _bannerAd = null;
+          setState(() {
+            _bannerAd = null;
+          });
 
           ad.dispose();
         },
       ),
     );
-    await _bannerAd!.load();
-
-    return SizedBox(
-      width: _bannerAd!.size.width.toDouble(),
-      height: _bannerAd!.size.height.toDouble(),
-      child: AdWidget(ad: _bannerAd!),
-    );
+    return _bannerAd!.load();
   }
 
   @override
@@ -177,26 +184,30 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         }
 
         if (!snapshot.hasData || snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.error,
-                  color: Colors.red,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  'Unable to View Post',
-                  style: TextStyle(
-                    color: FlavorConfig.instance.variables['appBlack'],
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error,
+                    color: Colors.red,
                   ),
-                ),
-              ],
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Unable to View Post',
+                    style: TextStyle(
+                      color: FlavorConfig.instance.variables['appBlack'],
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }
@@ -288,7 +299,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   color: Colors.white,
                   fontWeight: FontWeight.w900,
                   fontSize: 20,
-                  height: 1,
                 ),
               ),
               leading: IconButton(
@@ -312,36 +322,47 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               alwaysShowLeadingAndAction: true,
               appBarColor: Theme.of(context).primaryColor,
               headerExpandedHeight: 0.2,
-              headerWidget: CachedNetworkImage(
-                imageUrl: postDetailData.featuredImageSrc.large,
-                color: Colors.black.withOpacity(0.5),
-                colorBlendMode: BlendMode.darken,
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.width / 1.5,
-                fit: BoxFit.cover,
-                progressIndicatorBuilder: (context, url, downloadProgress) {
-                  return Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.width / 1.5,
-                    color: FlavorConfig.instance.variables['appLightGrey'],
-                    child: Center(
-                      child: LoadingAnimationWidget.prograssiveDots(
-                        color: FlavorConfig.instance.variables['appGrey'],
-                        size: 50,
+              headerWidget: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ImageDetailScreen(
+                        imageUrl: postDetailData.featuredImageSrc.large,
                       ),
                     ),
                   );
                 },
-                errorWidget: (context, url, error) {
-                  return Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.width / 1.5,
-                    color: FlavorConfig.instance.variables['appLightGrey'],
-                    child: const Center(
-                      child: Icon(Icons.error, size: 50),
-                    ),
-                  );
-                },
+                child: CachedNetworkImage(
+                  imageUrl: postDetailData.featuredImageSrc.large,
+                  color: Colors.black.withOpacity(0.5),
+                  colorBlendMode: BlendMode.darken,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.width / 1.5,
+                  fit: BoxFit.cover,
+                  progressIndicatorBuilder: (context, url, downloadProgress) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.width / 1.5,
+                      color: FlavorConfig.instance.variables['appLightGrey'],
+                      child: Center(
+                        child: LoadingAnimationWidget.prograssiveDots(
+                          color: FlavorConfig.instance.variables['appGrey'],
+                          size: 50,
+                        ),
+                      ),
+                    );
+                  },
+                  errorWidget: (context, url, error) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.width / 1.5,
+                      color: FlavorConfig.instance.variables['appLightGrey'],
+                      child: const Center(
+                        child: Icon(Icons.error, size: 50),
+                      ),
+                    );
+                  },
+                ),
               ),
               body: [
                 ListView(
@@ -469,7 +490,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           ],
                         ),
                         Text(
-                          DateFormat('EEE, dd MMMM y')
+                          DateFormat('dd MMMM y | HH:m')
                               .format(postDetailData.date),
                           style: TextStyle(
                             fontSize: 14,
@@ -502,24 +523,37 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           ),
                         );
                       },
-                    ),
-                    PostTag(postID: widget.postID),
-                    FutureBuilder<Widget>(
-                      future: _getBannerAd(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData || snapshot.hasError) {
-                          return const SizedBox.shrink();
-                        }
-
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const SizedBox(height: 20),
-                            snapshot.data!,
-                          ],
+                      onTapUrl: (tappedUrl) {
+                        FlutterWebBrowser.openWebPage(
+                          url: tappedUrl,
+                          customTabsOptions: CustomTabsOptions(
+                            defaultColorSchemeParams:
+                                CustomTabsColorSchemeParams(
+                              toolbarColor: Theme.of(context).primaryColor,
+                            ),
+                            showTitle: true,
+                          ),
                         );
+                        debugPrint('OnTapUrl fired');
+                        return true;
                       },
                     ),
+                    PostTag(postID: widget.postID),
+                    if (_bannerAd != null)
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: _bannerAd!.size.width.toDouble(),
+                            height: _bannerAd!.size.height.toDouble(),
+                            child: AdWidget(
+                              key: Key(_bannerAd!.adUnitId),
+                              ad: _bannerAd!,
+                            ),
+                          ),
+                        ],
+                      ),
                     RelatedPost(
                       categoryID: postDetailData.postTerms.first.id,
                       postKeyword: parsedPostTitleString.split('').first,
@@ -539,7 +573,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   void dispose() {
     super.dispose();
-
     _interstitialAd?.dispose();
     _bannerAd?.dispose();
   }

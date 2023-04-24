@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
-import 'package:ini_news_flutter/screens/states/empty_state.dart';
-import 'package:ini_news_flutter/screens/states/loading_state.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import '../controllers/bookmark_controller.dart';
 import '../databases/bookmark_database.dart';
 import '../screens/post_detail_screen.dart';
+import '../screens/states/empty_state.dart';
+import '../screens/states/loading_state.dart';
 import '../widgets/bookmark_item_card.dart';
 
 class BookmarkTab extends StatefulWidget {

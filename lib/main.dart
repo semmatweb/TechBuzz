@@ -17,7 +17,7 @@ Future<void> main() async {
 
   MobileAds.instance.initialize();
   RequestConfiguration configuration =
-      RequestConfiguration(testDeviceIds: ["E8E1B15D5B7D475188AC1CCC9BA5D5B1"]);
+      RequestConfiguration(testDeviceIds: ["500433D97FD57BD662DE72EFBD312F5E"]);
   MobileAds.instance.updateRequestConfiguration(configuration);
 
   // App-wide Config

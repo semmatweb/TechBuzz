@@ -9,8 +9,8 @@ class TagController {
   final Dio dio = Dio(
     BaseOptions(
       baseUrl: FlavorConfig.instance.variables['apiBaseUrl'],
-      receiveTimeout: const Duration(minutes: 1),
-      connectTimeout: const Duration(minutes: 1),
+      receiveTimeout: const Duration(seconds: 20),
+      connectTimeout: const Duration(seconds: 20),
     ),
   );
 

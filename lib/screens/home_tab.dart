@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:ini_news_flutter/screens/states/empty_state.dart';
-import 'package:ini_news_flutter/screens/states/loading_state.dart';
-import 'package:ini_news_flutter/screens/states/failed_state.dart';
-import 'package:ini_news_flutter/screens/states/refresh_state.dart';
 import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:html/parser.dart' show parse;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../ad_helper.dart';
@@ -13,6 +10,10 @@ import '../controllers/post_controller.dart';
 import '../models/menu_model.dart';
 import '../models/post_model.dart';
 import '../screens/post_detail_screen.dart';
+import '../screens/states/empty_state.dart';
+import '../screens/states/failed_state.dart';
+import '../screens/states/loading_state.dart';
+import '../screens/states/refresh_state.dart';
 import '../widgets/featured_post_item_card.dart';
 import '../widgets/post_item_card.dart';
 
@@ -80,14 +81,19 @@ class _HomeTabState extends State<HomeTab> {
         }
 
         if (!snapshot.hasData || snapshot.hasError) {
-          return FailedState(
-            stateIcon: Icons.error,
-            stateText: 'Failed Retrieving Post',
-            onPressed: () {
-              setState(() {
-                _fetchedMenu = _controller.getAllMenu();
-              });
-            },
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FailedState(
+                stateIcon: Icons.error,
+                stateText: 'Failed Retrieving Post',
+                onPressed: () {
+                  setState(() {
+                    _fetchedMenu = _controller.getAllMenu();
+                  });
+                },
+              ),
+            ],
           );
         }
 
@@ -109,19 +115,36 @@ class _HomeTabState extends State<HomeTab> {
                   Colors.transparent,
                 ),
                 labelColor: Theme.of(context).primaryColor,
-                labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+                labelStyle: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
+                labelPadding: const EdgeInsets.symmetric(horizontal: 10),
                 unselectedLabelColor:
                     FlavorConfig.instance.variables['appGrey'],
-                unselectedLabelStyle:
-                    const TextStyle(fontWeight: FontWeight.w500),
+                unselectedLabelStyle: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+                automaticIndicatorColorAdjustment: true,
                 indicatorColor: Theme.of(context).primaryColor,
                 indicatorSize: TabBarIndicatorSize.label,
                 tabs: [
-                  const Tab(text: 'Explore'),
-                  Tab(text: filterData(0).title),
-                  Tab(text: filterData(1).title),
-                  Tab(text: filterData(2).title),
-                  Tab(text: filterData(3).title),
+                  const Tab(
+                    text: 'Explore',
+                  ),
+                  Tab(
+                    text: filterData(0).title,
+                  ),
+                  Tab(
+                    text: filterData(1).title,
+                  ),
+                  Tab(
+                    text: filterData(2).title,
+                  ),
+                  Tab(
+                    text: filterData(3).title,
+                  ),
                 ],
               ),
               Expanded(
@@ -167,7 +190,7 @@ class PostTab extends StatefulWidget {
 class _PostTabState extends State<PostTab> {
   BannerAd? _bannerAd;
 
-  Future<Widget> _getBannerAd() async {
+  Future<void> _loadBannerAd() async {
     final AnchoredAdaptiveBannerAdSize? adSize =
         await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
       MediaQuery.of(context).size.width.truncate() - 40,
@@ -198,18 +221,13 @@ class _PostTabState extends State<PostTab> {
         },
       ),
     );
-    await _bannerAd!.load();
-
-    return SizedBox(
-      width: _bannerAd!.size.width.toDouble(),
-      height: _bannerAd!.size.height.toDouble(),
-      child: AdWidget(ad: _bannerAd!),
-    );
+    return _bannerAd!.load();
   }
 
   @override
   void initState() {
     super.initState();
+    Future.delayed(Duration.zero, _loadBannerAd);
   }
 
   @override
@@ -225,18 +243,24 @@ class _PostTabState extends State<PostTab> {
         ),
         cacheExtent: 500,
         addAutomaticKeepAlives: true,
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         builderDelegate: PagedChildBuilderDelegate<Post>(
           firstPageProgressIndicatorBuilder: (context) {
             return const LoadingState();
           },
           firstPageErrorIndicatorBuilder: (context) {
-            return FailedState(
-              stateIcon: Icons.error,
-              stateText: 'Failed Retrieving Post',
-              onPressed: () {
-                widget.pagingController.refresh();
-              },
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FailedState(
+                  stateIcon: Icons.error,
+                  stateText: 'Failed Retrieving Post',
+                  onPressed: () {
+                    widget.pagingController.refresh();
+                    Future.delayed(Duration.zero, _loadBannerAd);
+                  },
+                ),
+              ],
             );
           },
           newPageProgressIndicatorBuilder: (context) {
@@ -258,9 +282,16 @@ class _PostTabState extends State<PostTab> {
             final String parsedTitleString =
                 parse(rawTitleString.body!.text).documentElement!.text;
 
+            final isToday = DateTime(
+              DateTime.now().year,
+              DateTime.now().month,
+              DateTime.now().day,
+            );
+
             return Column(
               children: [
-                if (postData == widget.pagingController.itemList!.first)
+                if (widget.pagingController.itemList != null &&
+                    postData == widget.pagingController.itemList?.first)
                   FeaturedPostItem(
                     onTap: () {
                       Navigator.of(context).push(
@@ -276,12 +307,14 @@ class _PostTabState extends State<PostTab> {
                       );
                     },
                     postTitle: parsedTitleString,
-                    postDateTime:
-                        DateFormat('dd/MM/y | H:mm').format(postData.date),
+                    postDateTime: postData.date == isToday
+                        ? timeago.format(postData.date)
+                        : DateFormat('dd MMMM y').format(postData.date),
                     postCategory: postData.postTerms.first.name,
                     postImageUrl: postData.featuredImageSrc.large,
                   ),
-                if (postData != widget.pagingController.itemList!.first)
+                if (widget.pagingController.itemList != null &&
+                    postData != widget.pagingController.itemList!.first)
                   PostItem(
                     onTap: () {
                       Navigator.of(context).push(
@@ -297,8 +330,9 @@ class _PostTabState extends State<PostTab> {
                       );
                     },
                     postTitle: parsedTitleString,
-                    postDateTime:
-                        DateFormat('dd/MM/y | H:mm').format(postData.date),
+                    postDateTime: postData.date == isToday
+                        ? timeago.format(postData.date)
+                        : DateFormat('dd MMMM y').format(postData.date),
                     postCategory: postData.postTerms.first.name,
                     postImageUrl: postData.featuredImageSrc.large,
                   ),
@@ -307,23 +341,21 @@ class _PostTabState extends State<PostTab> {
           },
         ),
         separatorBuilder: (context, index) {
-          if (index == 5) {
-            return FutureBuilder<Widget>(
-              future: _getBannerAd(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData || snapshot.hasError) {
-                  return const SizedBox(height: 30);
-                }
-
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 30),
-                    snapshot.data!,
-                    const SizedBox(height: 30),
-                  ],
-                );
-              },
+          if (index == 5 && _bannerAd != null) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: _bannerAd!.size.width.toDouble(),
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(
+                    key: Key(_bannerAd!.adUnitId),
+                    ad: _bannerAd!,
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
             );
           } else {
             return const SizedBox(height: 30);

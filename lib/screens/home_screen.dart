@@ -46,7 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
             color: FlavorConfig.instance.variables['appBlack'],
             fontWeight: FontWeight.w900,
             fontSize: 20,
-            height: 1,
           ),
         ),
         actions: [
@@ -68,13 +67,11 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               textController: searchTextEditingController,
               boxShadow: false,
-              prefixIcon: const Icon(Icons.search),
-              suffixIcon: const Icon(Icons.close),
-              searchIconColor: FlavorConfig.instance.variables['appBlack'],
-              textFieldIconColor: FlavorConfig.instance.variables['appBlack'],
-              style: TextStyle(
-                color: FlavorConfig.instance.variables['appBlack'],
+              prefixIcon: Icon(
+                Icons.search,
+                color: Theme.of(context).primaryColor,
               ),
+              textFieldIconColor: FlavorConfig.instance.variables['appBlack'],
             ),
           )
         ],

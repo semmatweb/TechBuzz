@@ -1,10 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:ini_news_flutter/screens/states/loading_state.dart';
-import 'package:ini_news_flutter/screens/states/failed_state.dart';
+import 'package:intl/intl.dart';
 import '../controllers/category_controller.dart';
 import '../models/category_model.dart';
 import '../screens/category_detail_screen.dart';
+import '../screens/states/failed_state.dart';
+import '../screens/states/loading_state.dart';
 
 class CategoryTab extends StatefulWidget {
   const CategoryTab({super.key});
@@ -34,14 +35,19 @@ class _CategoryTabState extends State<CategoryTab> {
         }
 
         if (!snapshot.hasData || snapshot.hasError) {
-          return FailedState(
-            stateIcon: Icons.error,
-            stateText: 'Failed Retrieving Category',
-            onPressed: () {
-              setState(() {
-                _fetchedCategory = _controller.getAllCategories();
-              });
-            },
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FailedState(
+                stateIcon: Icons.error,
+                stateText: 'Failed Retrieving Category',
+                onPressed: () {
+                  setState(() {
+                    _fetchedCategory = _controller.getAllCategories();
+                  });
+                },
+              ),
+            ],
           );
         }
 
@@ -79,7 +85,7 @@ class _CategoryTabState extends State<CategoryTab> {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: backgroundColor,
                   borderRadius: BorderRadius.circular(12),
@@ -101,13 +107,13 @@ class _CategoryTabState extends State<CategoryTab> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
-                              categoryData.count.toString(),
+                              NumberFormat.compact().format(categoryData.count),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -119,13 +125,16 @@ class _CategoryTabState extends State<CategoryTab> {
                         const Spacer(),
                         Align(
                           alignment: Alignment.bottomLeft,
-                          child: Text(
-                            categoryData.name,
-                            maxLines: 2,
-                            style: TextStyle(
-                              color: foregroundColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width / 3.8,
+                            child: Text(
+                              categoryData.name,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: foregroundColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
