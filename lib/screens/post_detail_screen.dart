@@ -24,6 +24,7 @@ import '../screens/category_detail_screen.dart';
 import '../screens/image_detail_screen.dart';
 import '../screens/tag_detail_screen.dart';
 import '../screens/states/loading_state.dart';
+import '../widgets/post_banner_admob.dart';
 import '../widgets/post_item_card.dart';
 
 class PostDetailScreen extends StatefulWidget {
@@ -59,7 +60,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     super.initState();
     _checkBookmarkData();
     _loadInterstitialAd();
-    Future.delayed(Duration.zero, _loadBannerAd);
     _fetchedPostDetail = _controller.getPostDetail(widget.postID);
   }
 
@@ -124,44 +124,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         },
       ),
     );
-  }
-
-  BannerAd? _bannerAd;
-
-  Future<void> _loadBannerAd() async {
-    final AnchoredAdaptiveBannerAdSize? adSize =
-        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-      MediaQuery.of(context).size.width.truncate() - 40,
-    );
-
-    _bannerAd = BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      size: adSize!,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            _bannerAd = ad as BannerAd;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          setState(() {
-            _bannerAd = null;
-          });
-
-          debugPrint('Failed to load banner ad: ${error.message}');
-          ad.dispose();
-        },
-        onAdClosed: (ad) {
-          setState(() {
-            _bannerAd = null;
-          });
-
-          ad.dispose();
-        },
-      ),
-    );
-    return _bannerAd!.load();
   }
 
   @override
@@ -540,21 +502,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       },
                     ),
                     PostTag(postID: widget.postID),
-                    if (_bannerAd != null)
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            width: _bannerAd!.size.width.toDouble(),
-                            height: _bannerAd!.size.height.toDouble(),
-                            child: AdWidget(
-                              key: Key(_bannerAd!.adUnitId),
-                              ad: _bannerAd!,
-                            ),
-                          ),
-                        ],
-                      ),
+                    StatefulBuilder(
+                      builder: (context, setState) {
+                        return const PostBannerAdMob();
+                      },
+                    ),
                     RelatedPost(
                       categoryID: postDetailData.postTerms.first.id,
                       postKeyword: parsedPostTitleString.split('').first,
@@ -575,7 +527,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   void dispose() {
     super.dispose();
     _interstitialAd?.dispose();
-    _bannerAd?.dispose();
   }
 }
 
