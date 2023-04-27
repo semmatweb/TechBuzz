@@ -4,8 +4,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:html/parser.dart' show parse;
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import '../ad_helper.dart';
 import '../controllers/post_controller.dart';
 import '../models/menu_model.dart';
 import '../models/post_model.dart';
@@ -15,6 +13,7 @@ import '../screens/states/failed_state.dart';
 import '../screens/states/loading_state.dart';
 import '../screens/states/refresh_state.dart';
 import '../widgets/featured_post_item_card.dart';
+import '../widgets/banner_admob.dart';
 import '../widgets/post_item_card.dart';
 
 class HomeTab extends StatefulWidget {
@@ -188,48 +187,6 @@ class PostTab extends StatefulWidget {
 }
 
 class _PostTabState extends State<PostTab> {
-  BannerAd? _bannerAd;
-
-  Future<void> _loadBannerAd() async {
-    final AnchoredAdaptiveBannerAdSize? adSize =
-        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-      MediaQuery.of(context).size.width.truncate() - 40,
-    );
-
-    _bannerAd = BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      size: adSize!,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            _bannerAd = ad as BannerAd;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          setState(() {
-            _bannerAd = null;
-          });
-          debugPrint('Failed to load banner ad: ${error.message}');
-          ad.dispose();
-        },
-        onAdClosed: (ad) {
-          setState(() {
-            _bannerAd = null;
-          });
-          ad.dispose();
-        },
-      ),
-    );
-    return _bannerAd!.load();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero, _loadBannerAd);
-  }
-
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -257,7 +214,6 @@ class _PostTabState extends State<PostTab> {
                   stateText: 'Failed Retrieving Post',
                   onPressed: () {
                     widget.pagingController.refresh();
-                    Future.delayed(Duration.zero, _loadBannerAd);
                   },
                 ),
               ],
@@ -341,21 +297,11 @@ class _PostTabState extends State<PostTab> {
           },
         ),
         separatorBuilder: (context, index) {
-          if (index == 5 && _bannerAd != null) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: _bannerAd!.size.width.toDouble(),
-                  height: _bannerAd!.size.height.toDouble(),
-                  child: AdWidget(
-                    key: Key(_bannerAd!.adUnitId),
-                    ad: _bannerAd!,
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
+          if (index == 5) {
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return const BannerAdMob();
+              },
             );
           } else {
             return const SizedBox(height: 30);
@@ -363,11 +309,5 @@ class _PostTabState extends State<PostTab> {
         },
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _bannerAd?.dispose();
-    super.dispose();
   }
 }
