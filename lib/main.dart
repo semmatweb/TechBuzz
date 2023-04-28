@@ -37,10 +37,6 @@ Future<void> main() async {
       MaterialPageRoute(
         builder: (context) => PostDetailScreen(
           postID: notifData.additionalData!['post_id'],
-          postTitle: notifData.title!,
-          postCategory: 'Featured',
-          postDateTime: DateTime.now().toIso8601String(),
-          postImageUrl: 'https://placehold.co/600x400/EEE/31343C',
         ),
       ),
     );
@@ -48,7 +44,7 @@ Future<void> main() async {
 
   MobileAds.instance.initialize();
   RequestConfiguration configuration =
-      RequestConfiguration(testDeviceIds: ["500433D97FD57BD662DE72EFBD312F5E"]);
+      RequestConfiguration(testDeviceIds: ["E8E1B15D5B7D475188AC1CCC9BA5D5B1"]);
   MobileAds.instance.updateRequestConfiguration(configuration);
 
   // App-wide Config

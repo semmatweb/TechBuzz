@@ -31,17 +31,9 @@ class PostDetailScreen extends StatefulWidget {
   const PostDetailScreen({
     super.key,
     required this.postID,
-    required this.postTitle,
-    required this.postCategory,
-    required this.postDateTime,
-    required this.postImageUrl,
   });
 
   final int postID;
-  final String postTitle;
-  final String postCategory;
-  final String postDateTime;
-  final String postImageUrl;
 
   @override
   State<PostDetailScreen> createState() => _PostDetailScreenState();
@@ -66,22 +58,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   void _checkBookmarkData() async {
     Database db = await bookmarkDatabase.db;
 
-    final rawTitleString = parse(widget.postTitle);
-    final String parsedTitleString =
-        parse(rawTitleString.body!.text).documentElement!.text;
-
     List checkData = await db.query(
       "post_bookmark",
-      columns: [
-        "post_id",
-        "post_title",
-        "post_category",
-        "post_datetime",
-        "post_imageurl",
-        "is_bookmarked"
-      ],
-      where:
-          "post_id = ${widget.postID} and post_title = '$parsedTitleString' and post_category = '${widget.postCategory}' and post_datetime = '${widget.postDateTime}' and post_imageurl = '${widget.postImageUrl}' and is_bookmarked = 1",
+      where: "post_id = ${widget.postID}",
     );
 
     if (checkData.isNotEmpty) {
@@ -178,13 +157,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         PostDetail postDetailData = snapshot.data!;
 
         final rawPostTitleString = parse(postDetailData.title.rendered);
-        final String parsedPostTitleString =
+        final String parsedTitleString =
             parse(rawPostTitleString.body!.text).documentElement!.text;
 
         void bookmarkPost() async {
           _bookmarkController.addBookmark(
             postID: postDetailData.id,
-            postTitle: parsedPostTitleString,
+            postTitle: parsedTitleString,
             postCategory: postDetailData.postTerms.first.name,
             postDateTime: postDetailData.date.toIso8601String(),
             postImageUrl: postDetailData.featuredImageSrc.large,
@@ -420,7 +399,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      parsedPostTitleString,
+                      parsedTitleString,
                       style: TextStyle(
                         color: FlavorConfig.instance.variables['appBlack'],
                         fontSize: 24,
@@ -509,7 +488,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     ),
                     RelatedPost(
                       categoryID: postDetailData.postTerms.first.id,
-                      postKeyword: parsedPostTitleString.split('').first,
+                      postKeyword: parsedTitleString.split('').first,
                       excludePostID: postDetailData.id,
                     ),
                     const SizedBox(height: 30),
@@ -709,10 +688,6 @@ class _RelatedPostState extends State<RelatedPost> {
                         MaterialPageRoute(
                           builder: (context) => PostDetailScreen(
                             postID: postData.id,
-                            postTitle: postData.title.rendered,
-                            postCategory: postData.postTerms.first.name,
-                            postDateTime: postData.date.toIso8601String(),
-                            postImageUrl: postData.featuredImageSrc.large,
                           ),
                         ),
                       );

@@ -124,10 +124,6 @@ class _TagDetailScreenState extends State<TagDetailScreen> {
                         MaterialPageRoute(
                           builder: (context) => PostDetailScreen(
                             postID: postData.id,
-                            postTitle: postData.title.rendered,
-                            postCategory: postData.postTerms.first.name,
-                            postDateTime: postData.date.toIso8601String(),
-                            postImageUrl: postData.featuredImageSrc.large,
                           ),
                         ),
                       );
