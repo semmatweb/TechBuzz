@@ -20,11 +20,8 @@ Future<void> main() async {
     ),
   );
 
-  //Remove this method to stop OneSignal Debugging
-  OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+  // OneSignal
   OneSignal.shared.setAppId("1f41b0aa-54fe-4ffc-80ae-73aecc2334ea");
-
-  // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
   OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
     debugPrint("Accepted permission: $accepted");
   });
@@ -42,6 +39,7 @@ Future<void> main() async {
     );
   });
 
+  // AdMob
   MobileAds.instance.initialize();
   RequestConfiguration configuration =
       RequestConfiguration(testDeviceIds: ["E8E1B15D5B7D475188AC1CCC9BA5D5B1"]);
