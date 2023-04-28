@@ -55,10 +55,6 @@ class _BookmarkTabState extends State<BookmarkTab> {
                         MaterialPageRoute(
                           builder: (context) => PostDetailScreen(
                             postID: bookmarkData['post_id'],
-                            postTitle: bookmarkData['post_title'],
-                            postCategory: bookmarkData['post_category'],
-                            postDateTime: bookmarkData['post_datetime'],
-                            postImageUrl: bookmarkData['post_imageurl'],
                           ),
                         ),
                       )

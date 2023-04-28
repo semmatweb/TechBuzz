@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'screens/initialization_screen.dart';
+import 'screens/post_detail_screen.dart';
+import 'globals.dart' as globals;
 
 Future<void> main() async {
+  globals.appNavigator = GlobalKey<NavigatorState>();
+
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
@@ -15,9 +20,29 @@ Future<void> main() async {
     ),
   );
 
+  // OneSignal
+  OneSignal.shared.setAppId("1f41b0aa-54fe-4ffc-80ae-73aecc2334ea");
+  OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
+    debugPrint("Accepted permission: $accepted");
+  });
+
+  OneSignal.shared
+      .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+    var notifData = result.notification;
+
+    globals.appNavigator!.currentState!.push(
+      MaterialPageRoute(
+        builder: (context) => PostDetailScreen(
+          postID: notifData.additionalData!['post_id'],
+        ),
+      ),
+    );
+  });
+
+  // AdMob
   MobileAds.instance.initialize();
   RequestConfiguration configuration =
-      RequestConfiguration(testDeviceIds: ["500433D97FD57BD662DE72EFBD312F5E"]);
+      RequestConfiguration(testDeviceIds: ["E8E1B15D5B7D475188AC1CCC9BA5D5B1"]);
   MobileAds.instance.updateRequestConfiguration(configuration);
 
   // App-wide Config
@@ -61,6 +86,7 @@ class MyApp extends StatelessWidget {
           surfaceTintColor: Colors.black,
         ),
       ),
+      navigatorKey: globals.appNavigator,
       initialRoute: '/',
       routes: {
         '/': (context) => const InitializationScreen(),

@@ -254,10 +254,6 @@ class _PostTabState extends State<PostTab> {
                         MaterialPageRoute(
                           builder: (context) => PostDetailScreen(
                             postID: postData.id,
-                            postTitle: postData.title.rendered,
-                            postCategory: postData.postTerms.first.name,
-                            postDateTime: postData.date.toIso8601String(),
-                            postImageUrl: postData.featuredImageSrc.large,
                           ),
                         ),
                       );
@@ -277,10 +273,6 @@ class _PostTabState extends State<PostTab> {
                         MaterialPageRoute(
                           builder: (context) => PostDetailScreen(
                             postID: postData.id,
-                            postTitle: postData.title.rendered,
-                            postCategory: postData.postTerms.first.name,
-                            postDateTime: postData.date.toIso8601String(),
-                            postImageUrl: postData.featuredImageSrc.large,
                           ),
                         ),
                       );
