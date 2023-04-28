@@ -156,9 +156,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
         PostDetail postDetailData = snapshot.data!;
 
-        final rawPostTitleString = parse(postDetailData.title.rendered);
+        final rawTitleString = parse(postDetailData.title.rendered);
         final String parsedTitleString =
-            parse(rawPostTitleString.body!.text).documentElement!.text;
+            parse(rawTitleString.body!.text).documentElement!.text;
 
         void bookmarkPost() async {
           _bookmarkController.addBookmark(

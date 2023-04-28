@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:ini_news_flutter/screens/post_detail_screen.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'screens/initialization_screen.dart';
+import 'screens/post_detail_screen.dart';
 import 'globals.dart' as globals;
 
 Future<void> main() async {
