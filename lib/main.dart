@@ -4,6 +4,8 @@ import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'globals.dart';
 import 'screens/initialization_screen.dart';
 import 'screens/post_detail_screen.dart';
 import 'globals.dart' as globals;
@@ -65,14 +67,29 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    currentTheme.addListener(() {
+      debugPrint('Theme changed!');
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: FlavorConfig.instance.variables['appName'],
+      themeMode: currentTheme.currentTheme(),
       theme: ThemeData(
         useMaterial3: true,
         fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
@@ -80,10 +97,27 @@ class MyApp extends StatelessWidget {
         primarySwatch: FlavorConfig.instance.variables['appPrimarySwatch'],
         colorScheme: ColorScheme.fromSwatch().copyWith(
           secondary: FlavorConfig.instance.variables['appSecondaryColor'],
+          surfaceVariant: Colors.blue,
+          onSurfaceVariant: FlavorConfig.instance.variables['appGrey'],
         ),
         appBarTheme: const AppBarTheme(
           systemOverlayStyle: SystemUiOverlayStyle.dark,
           surfaceTintColor: Colors.black,
+        ),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
+        primaryColor: Colors.red,
+        primarySwatch: FlavorConfig.instance.variables['appPrimarySwatch'],
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          secondary: FlavorConfig.instance.variables['appSecondaryColor'],
+          surfaceVariant: Colors.red,
+          onSurfaceVariant: Colors.black,
+        ),
+        appBarTheme: const AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle.light,
+          surfaceTintColor: Colors.white,
         ),
       ),
       navigatorKey: globals.appNavigator,
@@ -94,3 +128,22 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+/* bool isDarkMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _getThemeState();
+  }
+
+  Future<void> _getThemeState() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      isDarkMode = prefs.getBool('isDarkMode') ?? false;
+    });
+
+    debugPrint('prefs: ${prefs.getBool('isDarkMode')}');
+    debugPrint('isDarkMode: $isDarkMode');
+  } */

@@ -119,8 +119,6 @@ class _HomeTabState extends State<HomeTab> {
                   fontSize: 14,
                 ),
                 labelPadding: const EdgeInsets.symmetric(horizontal: 10),
-                unselectedLabelColor:
-                    FlavorConfig.instance.variables['appGrey'],
                 unselectedLabelStyle: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,

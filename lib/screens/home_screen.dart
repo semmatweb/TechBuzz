@@ -2,6 +2,9 @@ import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:ini_news_flutter/globals.dart';
+import 'package:ini_news_flutter/screens/settings.dart';
+import 'package:ini_news_flutter/theme.dart';
 import '../screens/search_result_screen.dart';
 import '../screens/home_tab.dart';
 import '../screens/category_tab.dart';
@@ -27,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
     HomeTab(),
     CategoryTab(),
     BookmarkTab(),
+    SettingsScreen(),
   ];
 
   TextEditingController searchTextEditingController = TextEditingController();
@@ -34,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.isDark ? Colors.grey[900]! : Colors.white,
       appBar: AppBar(
         elevation: 0,
         surfaceTintColor: Colors.white,
@@ -82,11 +86,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: _screens.elementAt(_selectedIndex),
       bottomNavigationBar: GNav(
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.isDark ? Colors.grey[900]! : Colors.white,
         selectedIndex: _selectedIndex,
         onTabChange: _onItemTapped,
         style: GnavStyle.google,
-        color: FlavorConfig.instance.variables['appGrey'],
+        color: AppTheme.isDark
+            ? Colors.black
+            : FlavorConfig.instance.variables['appGrey'],
         textStyle: TextStyle(
           color: Theme.of(context).primaryColor,
           fontWeight: FontWeight.w600,
@@ -115,6 +121,11 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icons.bookmark,
             iconActiveColor: Theme.of(context).primaryColor,
             text: 'Bookmark',
+          ),
+          GButton(
+            icon: Icons.settings,
+            iconActiveColor: Theme.of(context).primaryColor,
+            text: 'Settings',
           ),
         ],
       ),
