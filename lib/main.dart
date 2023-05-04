@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'globals.dart';
 import 'screens/initialization_screen.dart';
 import 'screens/post_detail_screen.dart';
@@ -15,6 +15,10 @@ Future<void> main() async {
 
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  await Hive.initFlutter();
+  introBox = await Hive.openBox('introductionState');
+  themeBox = await Hive.openBox('themeState');
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -83,6 +87,20 @@ class _MyAppState extends State<MyApp> {
       setState(() {});
     });
   }
+
+  /* Future<void> _getThemeState() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getBool('isDarkMode') == AppTheme.isDark) {
+      setState(() {
+        isDarkMode = prefs.getBool('isDarkMode') ?? false;
+      });
+    }
+
+    debugPrint('AppTheme.isDark: ${AppTheme.isDark}');
+    debugPrint('isDarkMoode prefs: ${prefs.getBool('isDarkMode')}');
+    debugPrint('isDarkMode: $isDarkMode');
+  } */
 
   @override
   Widget build(BuildContext context) {

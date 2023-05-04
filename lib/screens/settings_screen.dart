@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:ini_news_flutter/globals.dart';
 import 'package:ini_news_flutter/theme.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -17,21 +16,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
+
     _getThemeState();
     currentTheme.addListener(() {
       debugPrint('Theme changed!');
       setState(() {});
     });
+    debugPrint('AppTheme.isDark: ${AppTheme.isDark}');
   }
 
   Future<void> _getThemeState() async {
-    final prefs = await SharedPreferences.getInstance();
+    if (themeBox!.get('isDarkMode') == AppTheme.isDark) {
+      setState(() {
+        isDarkMode = themeBox!.get('isDarkMode') ?? false;
+      });
+    }
 
-    setState(() {
-      isDarkMode = prefs.getBool('isDarkMode') ?? false;
-    });
-
-    debugPrint('prefs: ${prefs.getBool('isDarkMode')}');
+    debugPrint('AppTheme.isDark: ${AppTheme.isDark}');
+    debugPrint('isDarkMode themeBox: ${themeBox!.get('isDarkMode')}');
     debugPrint('isDarkMode: $isDarkMode');
   }
 
@@ -60,13 +62,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               splashRadius: 50.0,
               onChanged: (value) async {
                 currentTheme.switchTheme();
-                final prefs = await SharedPreferences.getInstance();
 
                 setState(() {
-                  isDarkMode = value;
-                  prefs.setBool('isDarkMode', value);
+                  isDarkMode = !isDarkMode;
+                  themeBox!.put('isDarkMode', isDarkMode);
                 });
-                debugPrint('prefs: ${prefs.getBool('isDarkMode')}');
+
+                debugPrint('AppTheme.isDark: ${AppTheme.isDark}');
+                debugPrint(
+                    'isDarkMode themeBox: ${themeBox!.get('isDarkMode')}');
                 debugPrint('isDarkMode: $isDarkMode');
               },
             )

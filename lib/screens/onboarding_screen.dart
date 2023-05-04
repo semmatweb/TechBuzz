@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
+import 'package:ini_news_flutter/globals.dart';
 import 'package:introduction_screen/introduction_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -14,9 +14,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final introKey = GlobalKey<IntroductionScreenState>();
 
   void _onIntroEnd(context) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isIntroduced', true);
-    debugPrint('prefs: ${prefs.getBool('isIntroduced')}');
+    await introBox!.put('isIntroduced', true);
+    debugPrint('box: ${introBox!.get('isIntroduced')}');
     if (!mounted) return;
     Navigator.of(context).pushReplacementNamed('/');
   }
