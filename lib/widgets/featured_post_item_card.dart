@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
+import 'package:ini_news_flutter/theme.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class FeaturedPostItem extends StatelessWidget {
@@ -53,8 +54,11 @@ class FeaturedPostItem extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
-                    color: FlavorConfig
-                        .instance.variables['appSecondaryAccentColor'],
+                    color: AppTheme.isDark
+                        ? FlavorConfig
+                            .instance.variables['appDarkSecondaryAccentColor']
+                        : FlavorConfig
+                            .instance.variables['appSecondaryAccentColor'],
                   ),
                   child: Text(
                     postCategory!,
@@ -98,12 +102,12 @@ class FeaturedPostItem extends StatelessWidget {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.width / 1.5,
             decoration: BoxDecoration(
-              color: FlavorConfig.instance.variables['appLightGrey'],
+              color: Theme.of(context).dividerTheme.color,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: FlavorConfig.instance.variables['appGrey'],
+                color: Theme.of(context).iconTheme.color!,
                 size: 50,
               ),
             ),
@@ -114,12 +118,13 @@ class FeaturedPostItem extends StatelessWidget {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.width / 1.5,
             decoration: BoxDecoration(
-              color: FlavorConfig.instance.variables['appLightGrey'],
+              color: Theme.of(context).dividerTheme.color,
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Center(
               child: Icon(
                 Icons.error,
+                color: Colors.red,
                 size: 50,
               ),
             ),

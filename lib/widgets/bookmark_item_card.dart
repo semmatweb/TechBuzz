@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
+import 'package:ini_news_flutter/theme.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class BookmarkPostItem extends StatelessWidget {
@@ -39,7 +40,10 @@ class BookmarkPostItem extends StatelessWidget {
                     Text(
                       bookmarkPostCategory,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.secondary,
+                        color: AppTheme.isDark
+                            ? FlavorConfig.instance
+                                .variables['appDarkSecondaryAccentColor']
+                            : Theme.of(context).colorScheme.secondary,
                         fontWeight: FontWeight.w600,
                         fontSize: 12,
                       ),
@@ -51,8 +55,7 @@ class BookmarkPostItem extends StatelessWidget {
                       bookmarkPostTitle,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: FlavorConfig.instance.variables['appBlack'],
+                      style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 16,
                       ),
@@ -65,7 +68,7 @@ class BookmarkPostItem extends StatelessWidget {
                       maxLines: 1,
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                        color: FlavorConfig.instance.variables['appDarkGrey'],
+                        color: Theme.of(context).textTheme.bodySmall!.color,
                         fontWeight: FontWeight.w500,
                         fontSize: 12,
                       ),
@@ -96,14 +99,14 @@ class BookmarkPostItem extends StatelessWidget {
                 progressIndicatorBuilder: (context, url, downloadProgress) {
                   return Container(
                     width: MediaQuery.of(context).size.width / 3.5,
-                    height: MediaQuery.of(context).size.width / 4.5,
+                    height: MediaQuery.of(context).size.width / 3.5,
                     decoration: BoxDecoration(
-                      color: FlavorConfig.instance.variables['appLightGrey'],
+                      color: Theme.of(context).dividerTheme.color,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
                       child: LoadingAnimationWidget.prograssiveDots(
-                        color: FlavorConfig.instance.variables['appGrey'],
+                        color: Theme.of(context).iconTheme.color!,
                         size: 50,
                       ),
                     ),
@@ -112,14 +115,15 @@ class BookmarkPostItem extends StatelessWidget {
                 errorWidget: (context, url, error) {
                   return Container(
                     width: MediaQuery.of(context).size.width / 3.5,
-                    height: MediaQuery.of(context).size.width / 4.5,
+                    height: MediaQuery.of(context).size.width / 3.5,
                     decoration: BoxDecoration(
-                      color: FlavorConfig.instance.variables['appLightGrey'],
+                      color: Theme.of(context).dividerTheme.color,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
                       child: Icon(
                         Icons.error,
+                        color: Colors.red,
                         size: 50,
                       ),
                     ),
@@ -136,8 +140,8 @@ class BookmarkPostItem extends StatelessWidget {
             child: ElevatedButton(
               onPressed: onButtonPressed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red[50],
-                foregroundColor: Colors.red,
+                backgroundColor: AppTheme.isDark ? Colors.red : Colors.red[50],
+                foregroundColor: AppTheme.isDark ? Colors.red[50] : Colors.red,
                 shadowColor: Colors.transparent,
                 surfaceTintColor: Colors.transparent,
               ),

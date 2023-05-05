@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flavor/flutter_flavor.dart';
 
 class EmptyState extends StatelessWidget {
   const EmptyState({super.key, required this.stateText});
@@ -13,7 +12,7 @@ class EmptyState extends StatelessWidget {
         stateText,
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: FlavorConfig.instance.variables['appGrey'],
+          color: Theme.of(context).textTheme.displayLarge!.color,
           fontSize: 32,
           fontWeight: FontWeight.w800,
           height: 1,

@@ -48,7 +48,7 @@ Future<void> main() async {
   // AdMob
   MobileAds.instance.initialize();
   RequestConfiguration configuration =
-      RequestConfiguration(testDeviceIds: ["E8E1B15D5B7D475188AC1CCC9BA5D5B1"]);
+      RequestConfiguration(testDeviceIds: ["03ECFD73D1A81042944D176D4DE6C0EA"]);
   MobileAds.instance.updateRequestConfiguration(configuration);
 
   // App-wide Config
@@ -62,6 +62,11 @@ Future<void> main() async {
       'appPrimaryAccentColor': const Color.fromARGB(255, 220, 230, 240),
       'appSecondaryColor': const Color.fromARGB(255, 255, 150, 40),
       'appSecondaryAccentColor': const Color.fromARGB(255, 255, 230, 200),
+      'appDarkPrimarySwatch': Colors.indigo,
+      'appDarkPrimaryAccentColor': const Color.fromARGB(255, 38, 68, 120),
+      'appDarkPrimaryColor': const Color.fromARGB(255, 168, 200, 255),
+      'appDarkSecondaryColor': const Color.fromARGB(255, 255, 230, 200),
+      'appDarkSecondaryAccentColor': const Color.fromARGB(255, 255, 150, 40),
       'appLightGrey': const Color.fromARGB(255, 232, 232, 232),
       'appGrey': const Color.fromARGB(255, 192, 192, 192),
       'appDarkGrey': const Color.fromARGB(255, 114, 114, 114),
@@ -88,20 +93,6 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  /* Future<void> _getThemeState() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    if (prefs.getBool('isDarkMode') == AppTheme.isDark) {
-      setState(() {
-        isDarkMode = prefs.getBool('isDarkMode') ?? false;
-      });
-    }
-
-    debugPrint('AppTheme.isDark: ${AppTheme.isDark}');
-    debugPrint('isDarkMoode prefs: ${prefs.getBool('isDarkMode')}');
-    debugPrint('isDarkMode: $isDarkMode');
-  } */
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -114,28 +105,91 @@ class _MyAppState extends State<MyApp> {
         primaryColor: FlavorConfig.instance.variables['appPrimaryColor'],
         primarySwatch: FlavorConfig.instance.variables['appPrimarySwatch'],
         colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: FlavorConfig.instance.variables['appPrimaryColor'],
           secondary: FlavorConfig.instance.variables['appSecondaryColor'],
-          surfaceVariant: Colors.blue,
+          surfaceVariant: Colors.transparent,
           onSurfaceVariant: FlavorConfig.instance.variables['appGrey'],
         ),
-        appBarTheme: const AppBarTheme(
+        canvasColor: Colors.white,
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: AppBarTheme(
           systemOverlayStyle: SystemUiOverlayStyle.dark,
-          surfaceTintColor: Colors.black,
+          iconTheme:
+              IconThemeData(color: FlavorConfig.instance.variables['appBlack']),
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          titleTextStyle: TextStyle(
+            fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
+            color: FlavorConfig.instance.variables['appBlack'],
+            fontWeight: FontWeight.w900,
+            fontSize: 20,
+          ),
+        ),
+        textTheme: TextTheme(
+          bodyMedium: TextStyle(
+            fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
+            color: FlavorConfig.instance.variables['appBlack'],
+          ),
+          bodySmall: TextStyle(
+            fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
+            color: FlavorConfig.instance.variables['appDarkGrey'],
+          ),
+          displayLarge: TextStyle(
+            fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
+            color: FlavorConfig.instance.variables['appGrey'],
+          ),
+        ),
+        iconTheme: IconThemeData(
+          color: FlavorConfig.instance.variables['appGrey'],
+        ),
+        dividerTheme: DividerThemeData(
+          color: FlavorConfig.instance.variables['appLightGrey'],
         ),
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
         fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
-        primaryColor: Colors.red,
-        primarySwatch: FlavorConfig.instance.variables['appPrimarySwatch'],
+        primaryColor: FlavorConfig.instance.variables['appDarkPrimaryColor'],
+        primarySwatch: FlavorConfig.instance.variables['appDarkPrimarySwatch'],
         colorScheme: ColorScheme.fromSwatch().copyWith(
-          secondary: FlavorConfig.instance.variables['appSecondaryColor'],
-          surfaceVariant: Colors.red,
-          onSurfaceVariant: Colors.black,
+          primary: FlavorConfig.instance.variables['appDarkPrimaryColor'],
+          secondary: FlavorConfig.instance.variables['appDarkSecondaryColor'],
+          surfaceVariant: Colors.transparent,
+          onSurfaceVariant: const Color.fromARGB(255, 140, 140, 140),
         ),
-        appBarTheme: const AppBarTheme(
+        canvasColor: const Color.fromARGB(255, 40, 40, 40),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 24, 24, 24),
+        appBarTheme: AppBarTheme(
           systemOverlayStyle: SystemUiOverlayStyle.light,
-          surfaceTintColor: Colors.white,
+          iconTheme: const IconThemeData(color: Colors.white),
+          backgroundColor: const Color.fromARGB(255, 24, 24, 24),
+          surfaceTintColor: Colors.transparent,
+          titleTextStyle: TextStyle(
+            fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
+            color: Colors.white,
+            fontWeight: FontWeight.w900,
+            fontSize: 20,
+          ),
+        ),
+        textTheme: TextTheme(
+          bodyMedium: TextStyle(
+            fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
+            color: Colors.white,
+          ),
+          bodySmall: TextStyle(
+            fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
+            color: const Color.fromARGB(255, 140, 140, 140),
+          ),
+          displayLarge: TextStyle(
+            fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
+            color: const Color.fromARGB(255, 12, 12, 12),
+          ),
+        ),
+        iconTheme: const IconThemeData(
+          color: Color.fromARGB(255, 140, 140, 140),
+        ),
+        dividerTheme: const DividerThemeData(
+          color: Color.fromARGB(255, 40, 40, 40),
         ),
       ),
       navigatorKey: globals.appNavigator,
@@ -146,22 +200,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-/* bool isDarkMode = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _getThemeState();
-  }
-
-  Future<void> _getThemeState() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    setState(() {
-      isDarkMode = prefs.getBool('isDarkMode') ?? false;
-    });
-
-    debugPrint('prefs: ${prefs.getBool('isDarkMode')}');
-    debugPrint('isDarkMode: $isDarkMode');
-  } */

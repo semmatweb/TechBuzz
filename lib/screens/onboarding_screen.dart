@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:ini_news_flutter/globals.dart';
+import 'package:ini_news_flutter/theme.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -30,7 +31,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: IntroductionScreen(
         key: introKey,
         curve: Curves.fastLinearToSlowEaseIn,
-        globalBackgroundColor: Colors.white,
+        globalBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
         showSkipButton: true,
         onSkip: () => _onIntroEnd(context),
         skip: Text(
@@ -59,7 +60,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         controlsPadding: const EdgeInsets.all(20),
         dotsDecorator: DotsDecorator(
           size: const Size.square(10),
-          color: FlavorConfig.instance.variables['appGrey'],
+          color: AppTheme.isDark
+              ? Theme.of(context).canvasColor
+              : FlavorConfig.instance.variables['appGrey'],
           activeSize: const Size(24, 10),
           activeShape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
@@ -84,13 +87,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             decoration: PageDecoration(
               bodyFlex: 0,
-              titleTextStyle: TextStyle(
-                color: FlavorConfig.instance.variables['appBlack'],
+              titleTextStyle: const TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 20,
               ),
               bodyTextStyle: TextStyle(
-                color: FlavorConfig.instance.variables['appDarkGrey'],
+                color: AppTheme.isDark
+                    ? Colors.white
+                    : FlavorConfig.instance.variables['appDarkGrey'],
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
               ),
@@ -110,13 +114,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             decoration: PageDecoration(
               fullScreen: true,
               bodyFlex: 0,
-              titleTextStyle: TextStyle(
-                color: FlavorConfig.instance.variables['appBlack'],
+              titleTextStyle: const TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 20,
               ),
               bodyTextStyle: TextStyle(
-                color: FlavorConfig.instance.variables['appDarkGrey'],
+                color: AppTheme.isDark
+                    ? Colors.white
+                    : FlavorConfig.instance.variables['appDarkGrey'],
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
               ),
@@ -146,13 +151,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             decoration: PageDecoration(
               bodyFlex: 0,
-              titleTextStyle: TextStyle(
-                color: FlavorConfig.instance.variables['appBlack'],
+              titleTextStyle: const TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 20,
               ),
               bodyTextStyle: TextStyle(
-                color: FlavorConfig.instance.variables['appDarkGrey'],
+                color: AppTheme.isDark
+                    ? Colors.white
+                    : FlavorConfig.instance.variables['appDarkGrey'],
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
               ),

@@ -5,8 +5,8 @@ import 'package:intl/intl.dart';
 import '../controllers/category_controller.dart';
 import '../models/category_model.dart';
 import '../screens/category_detail_screen.dart';
-import '../screens/states/failed_state.dart';
-import '../screens/states/loading_state.dart';
+import '../widgets/states/failed_state.dart';
+import '../widgets/states/loading_state.dart';
 
 class CategoryTab extends StatefulWidget {
   const CategoryTab({super.key});

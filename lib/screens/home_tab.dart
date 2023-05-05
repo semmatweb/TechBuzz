@@ -7,10 +7,10 @@ import '../controllers/post_controller.dart';
 import '../models/menu_model.dart';
 import '../models/post_model.dart';
 import '../screens/post_detail_screen.dart';
-import '../screens/states/empty_state.dart';
-import '../screens/states/failed_state.dart';
-import '../screens/states/loading_state.dart';
-import '../screens/states/refresh_state.dart';
+import '../widgets/states/empty_state.dart';
+import '../widgets/states/failed_state.dart';
+import '../widgets/states/loading_state.dart';
+import '../widgets/states/refresh_state.dart';
 import '../widgets/featured_post_item_card.dart';
 import '../widgets/banner_admob.dart';
 import '../widgets/post_item_card.dart';
@@ -122,7 +122,6 @@ class _HomeTabState extends State<HomeTab> {
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
-                automaticIndicatorColorAdjustment: true,
                 indicatorColor: Theme.of(context).primaryColor,
                 indicatorSize: TabBarIndicatorSize.label,
                 tabs: [
@@ -188,8 +187,6 @@ class _PostTabState extends State<PostTab> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () => Future.sync(() => widget.pagingController.refresh()),
-      color: Theme.of(context).primaryColor,
-      backgroundColor: Colors.white,
       child: PagedListView<int, Post>.separated(
         pagingController: widget.pagingController,
         physics: const BouncingScrollPhysics(

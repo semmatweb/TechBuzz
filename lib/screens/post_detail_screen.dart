@@ -4,6 +4,7 @@ import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:ini_news_flutter/theme.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -23,7 +24,7 @@ import '../models/tag_model.dart';
 import '../screens/category_detail_screen.dart';
 import '../screens/image_detail_screen.dart';
 import '../screens/tag_detail_screen.dart';
-import '../screens/states/loading_state.dart';
+import '../widgets/states/loading_state.dart';
 import '../widgets/post_banner_admob.dart';
 import '../widgets/post_item_card.dart';
 
@@ -119,7 +120,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
-            backgroundColor: Colors.white,
             appBar: AppBar(),
             body: const LoadingState(),
           );
@@ -127,23 +127,21 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
         if (!snapshot.hasData || snapshot.hasError) {
           return Scaffold(
-            backgroundColor: Colors.white,
             appBar: AppBar(),
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
+                children: const [
+                  Icon(
                     Icons.error,
                     color: Colors.red,
                   ),
-                  const SizedBox(
+                  SizedBox(
                     height: 10,
                   ),
                   Text(
                     'Unable to View Post',
                     style: TextStyle(
-                      color: FlavorConfig.instance.variables['appBlack'],
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),
@@ -222,17 +220,14 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           child: Scaffold(
             extendBodyBehindAppBar: true,
             extendBody: true,
-            backgroundColor: Colors.white,
             appBar: AppBar(
               systemOverlayStyle: SystemUiOverlayStyle.light,
               automaticallyImplyLeading: false,
               backgroundColor: Colors.transparent,
-              surfaceTintColor: Theme.of(context).primaryColor,
               elevation: 0,
               toolbarHeight: 0,
             ),
             body: DraggableHome(
-              backgroundColor: Colors.white,
               title: Text(
                 FlavorConfig.instance.variables['appName']
                     .toString()
@@ -262,7 +257,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 },
               ),
               alwaysShowLeadingAndAction: true,
-              appBarColor: Theme.of(context).primaryColor,
+              appBarColor: AppTheme.isDark
+                  ? FlavorConfig.instance.variables['appDarkPrimaryAccentColor']
+                  : Theme.of(context).primaryColor,
               headerExpandedHeight: 0.2,
               headerWidget: GestureDetector(
                 onTap: () {
@@ -328,8 +325,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: FlavorConfig
-                                .instance.variables['appSecondaryAccentColor'],
+                            backgroundColor: AppTheme.isDark
+                                ? FlavorConfig.instance
+                                    .variables['appDarkSecondaryAccentColor']
+                                : FlavorConfig.instance
+                                    .variables['appSecondaryAccentColor'],
                             elevation: 0,
                             surfaceTintColor: Colors.transparent,
                             shadowColor: Colors.transparent,
@@ -354,15 +354,17 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             Share.share(postDetailData.link);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                FlavorConfig.instance.variables['appLightGrey'],
+                            backgroundColor: AppTheme.isDark
+                                ? Theme.of(context).canvasColor
+                                : FlavorConfig
+                                    .instance.variables['appLightGrey'],
                             elevation: 0,
                             surfaceTintColor: Colors.transparent,
                             shadowColor: Colors.transparent,
                           ),
                           child: Icon(
                             Icons.shortcut,
-                            color: FlavorConfig.instance.variables['appGrey'],
+                            color: Theme.of(context).iconTheme.color,
                           ),
                         ),
                         const SizedBox(
@@ -378,10 +380,15 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: isBookmarkAlreadyExist
-                                ? FlavorConfig
-                                    .instance.variables['appPrimaryAccentColor']
-                                : FlavorConfig
-                                    .instance.variables['appLightGrey'],
+                                ? AppTheme.isDark
+                                    ? FlavorConfig.instance
+                                        .variables['appDarkPrimaryAccentColor']
+                                    : FlavorConfig.instance
+                                        .variables['appPrimaryAccentColor']
+                                : AppTheme.isDark
+                                    ? Theme.of(context).canvasColor
+                                    : FlavorConfig
+                                        .instance.variables['appLightGrey'],
                             elevation: 0,
                             surfaceTintColor: Colors.transparent,
                             shadowColor: Colors.transparent,
@@ -391,8 +398,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                 ? Icons.bookmark
                                 : Icons.bookmark_add_outlined,
                             color: isBookmarkAlreadyExist
-                                ? Theme.of(context).primaryColor
-                                : FlavorConfig.instance.variables['appGrey'],
+                                ? FlavorConfig
+                                    .instance.variables['appDarkPrimaryColor']
+                                : Theme.of(context).iconTheme.color,
                           ),
                         ),
                       ],
@@ -400,8 +408,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     const SizedBox(height: 20),
                     Text(
                       parsedTitleString,
-                      style: TextStyle(
-                        color: FlavorConfig.instance.variables['appBlack'],
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
                       ),
@@ -415,43 +422,67 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             Text(
                               'by ',
                               style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .color,
                                 fontSize: 12,
-                                color:
-                                    FlavorConfig.instance.variables['appBlack'],
                               ),
                             ),
                             Text(
                               postDetailData.authorDetails.displayName,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14,
-                                color:
-                                    FlavorConfig.instance.variables['appBlack'],
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
                         ),
-                        Text(
-                          DateFormat('dd MMMM y | HH:m')
-                              .format(postDetailData.date),
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: FlavorConfig.instance.variables['appBlack'],
-                            fontWeight: FontWeight.w500,
+                        IntrinsicHeight(
+                          child: Row(
+                            children: [
+                              Text(
+                                DateFormat('dd MMMM y')
+                                    .format(postDetailData.date),
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .color,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              VerticalDivider(
+                                color: Theme.of(context).primaryColor,
+                                thickness: 2,
+                                indent: 3,
+                                endIndent: 3,
+                              ),
+                              Text(
+                                DateFormat('HH:m').format(postDetailData.date),
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .color,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    Divider(
-                      color: FlavorConfig.instance.variables['appLightGrey'],
+                    const Divider(
                       thickness: 2,
                     ),
                     const SizedBox(height: 20),
                     HtmlWidget(
                       postDetailData.content.rendered,
-                      textStyle: TextStyle(
-                        color: FlavorConfig.instance.variables['appBlack'],
+                      textStyle: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -543,10 +574,9 @@ class _PostTagState extends State<PostTag> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-              Text(
+              const Text(
                 'Tag',
                 style: TextStyle(
-                  color: FlavorConfig.instance.variables['appBlack'],
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                 ),
@@ -578,8 +608,10 @@ class _PostTagState extends State<PostTag> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: FlavorConfig
-                          .instance.variables['appPrimaryAccentColor'],
+                      backgroundColor: AppTheme.isDark
+                          ? Theme.of(context).primaryColor
+                          : FlavorConfig
+                              .instance.variables['appPrimaryAccentColor'],
                       elevation: 0,
                       surfaceTintColor: Colors.transparent,
                       shadowColor: Colors.transparent,
@@ -590,7 +622,12 @@ class _PostTagState extends State<PostTag> {
                     child: Text(
                       tagData.name,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Theme.of(context).primaryColor),
+                      style: TextStyle(
+                        color: AppTheme.isDark
+                            ? FlavorConfig
+                                .instance.variables['appDarkPrimaryAccentColor']
+                            : Theme.of(context).primaryColor,
+                      ),
                     ),
                   );
                 },
@@ -650,15 +687,13 @@ class _RelatedPostState extends State<RelatedPost> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              Divider(
-                color: FlavorConfig.instance.variables['appLightGrey'],
+              const Divider(
                 thickness: 2,
               ),
               const SizedBox(height: 20),
-              Text(
+              const Text(
                 'Related Post',
                 style: TextStyle(
-                  color: FlavorConfig.instance.variables['appBlack'],
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                 ),

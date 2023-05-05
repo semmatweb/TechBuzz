@@ -16,20 +16,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-
     _getThemeState();
-    currentTheme.addListener(() {
-      debugPrint('Theme changed!');
-      setState(() {});
-    });
     debugPrint('AppTheme.isDark: ${AppTheme.isDark}');
   }
 
   Future<void> _getThemeState() async {
     if (themeBox!.get('isDarkMode') == AppTheme.isDark) {
-      setState(() {
-        isDarkMode = themeBox!.get('isDarkMode') ?? false;
-      });
+      if (mounted) {
+        setState(() {
+          isDarkMode = themeBox!.get('isDarkMode') ?? false;
+        });
+      }
     }
 
     debugPrint('AppTheme.isDark: ${AppTheme.isDark}');
@@ -45,17 +42,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Dark Mode',
               style: TextStyle(
-                color: FlavorConfig.instance.variables['appBlack'],
                 fontWeight: FontWeight.w700,
               ),
             ),
             Switch(
               value: isDarkMode,
               activeColor: Colors.white,
-              activeTrackColor: Theme.of(context).primaryColor,
+              activeTrackColor: AppTheme.isDark
+                  ? FlavorConfig.instance.variables['appDarkPrimaryAccentColor']
+                  : Theme.of(context).primaryColor,
               inactiveThumbColor: FlavorConfig.instance.variables['appGrey'],
               inactiveTrackColor:
                   FlavorConfig.instance.variables['appLightGrey'],
