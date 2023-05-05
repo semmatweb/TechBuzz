@@ -8,10 +8,9 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'globals.dart';
 import 'screens/initialization_screen.dart';
 import 'screens/post_detail_screen.dart';
-import 'globals.dart' as globals;
 
 Future<void> main() async {
-  globals.appNavigator = GlobalKey<NavigatorState>();
+  appNavigator = GlobalKey<NavigatorState>();
 
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -36,7 +35,7 @@ Future<void> main() async {
       .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
     var notifData = result.notification;
 
-    globals.appNavigator!.currentState!.push(
+    appNavigator!.currentState!.push(
       MaterialPageRoute(
         builder: (context) => PostDetailScreen(
           postID: notifData.additionalData!['post_id'],
@@ -192,7 +191,7 @@ class _MyAppState extends State<MyApp> {
           color: Color.fromARGB(255, 40, 40, 40),
         ),
       ),
-      navigatorKey: globals.appNavigator,
+      navigatorKey: appNavigator,
       initialRoute: '/',
       routes: {
         '/': (context) => const InitializationScreen(),
