@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -7,10 +6,10 @@ import 'package:html/parser.dart' show parse;
 import '../controllers/category_controller.dart';
 import '../models/post_model.dart';
 import '../screens/post_detail_screen.dart';
-import '../screens/states/empty_state.dart';
-import '../screens/states/failed_state.dart';
-import '../screens/states/loading_state.dart';
-import '../screens/states/refresh_state.dart';
+import '../widgets/states/empty_state.dart';
+import '../widgets/states/failed_state.dart';
+import '../widgets/states/loading_state.dart';
+import '../widgets/states/refresh_state.dart';
 import '../widgets/post_item_card.dart';
 
 class CategoryDetailScreen extends StatefulWidget {
@@ -47,15 +46,11 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
     final categoryPagingController = _controller.filteredPostController;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
           widget.categoryName,
-          style: TextStyle(
-            color: FlavorConfig.instance.variables['appBlack'],
+          style: const TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 20,
           ),
@@ -63,8 +58,6 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () => Future.sync(() => categoryPagingController.refresh()),
-        color: Theme.of(context).primaryColor,
-        backgroundColor: Colors.white,
         child: PagedListView<int, Post>.separated(
           pagingController: categoryPagingController,
           physics: const BouncingScrollPhysics(

@@ -2,10 +2,12 @@ import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import '../screens/search_result_screen.dart';
-import '../screens/home_tab.dart';
-import '../screens/category_tab.dart';
 import '../screens/bookmark_tab.dart';
+import '../screens/category_tab.dart';
+import '../screens/home_tab.dart';
+import '../screens/search_result_screen.dart';
+import '../screens/settings_screen.dart';
+import '../theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     HomeTab(),
     CategoryTab(),
     BookmarkTab(),
+    SettingsScreen(),
   ];
 
   TextEditingController searchTextEditingController = TextEditingController();
@@ -34,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         surfaceTintColor: Colors.white,
@@ -42,11 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         title: Text(
           FlavorConfig.instance.variables['appName'].toString().toUpperCase(),
-          style: TextStyle(
-            color: FlavorConfig.instance.variables['appBlack'],
-            fontWeight: FontWeight.w900,
-            fontSize: 20,
-          ),
         ),
         actions: [
           Padding(
@@ -66,55 +63,65 @@ class _HomeScreenState extends State<HomeScreen> {
                 searchTextEditingController.clear();
               },
               textController: searchTextEditingController,
-              color: FlavorConfig.instance.variables['appPrimaryAccentColor'],
+              color: AppTheme.isDark
+                  ? FlavorConfig.instance.variables['appDarkPrimaryAccentColor']
+                  : FlavorConfig.instance.variables['appPrimaryAccentColor'],
               boxShadow: false,
+              helpText: 'Search...',
+              style: Theme.of(context).textTheme.bodyMedium,
+              textFieldColor: Theme.of(context).canvasColor,
+              textFieldIconColor: Theme.of(context).textTheme.bodyMedium!.color,
               prefixIcon: Icon(
                 Icons.search,
                 color: Theme.of(context).primaryColor,
               ),
               suffixIcon: Icon(
                 Icons.close,
+                size: 20,
                 color: Theme.of(context).primaryColor,
               ),
             ),
-          )
+          ),
         ],
       ),
       body: _screens.elementAt(_selectedIndex),
       bottomNavigationBar: GNav(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         selectedIndex: _selectedIndex,
         onTabChange: _onItemTapped,
         style: GnavStyle.google,
-        color: FlavorConfig.instance.variables['appGrey'],
+        color: Theme.of(context).iconTheme.color,
+        activeColor: Theme.of(context).primaryColor,
         textStyle: TextStyle(
           color: Theme.of(context).primaryColor,
           fontWeight: FontWeight.w600,
         ),
         gap: 8,
         iconSize: 28,
-        tabBackgroundColor:
-            FlavorConfig.instance.variables['appPrimaryAccentColor'],
+        tabBackgroundColor: AppTheme.isDark
+            ? FlavorConfig.instance.variables['appDarkPrimaryAccentColor']
+            : FlavorConfig.instance.variables['appPrimaryAccentColor'],
         tabShadow: const [BoxShadow(color: Colors.transparent)],
         tabMargin: const EdgeInsets.symmetric(vertical: 20),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.all(10),
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         curve: Curves.easeInCirc,
-        tabs: [
+        tabs: const [
           GButton(
             icon: Icons.home_filled,
-            iconActiveColor: Theme.of(context).primaryColor,
             text: 'Home',
           ),
           GButton(
             icon: Icons.dashboard,
-            iconActiveColor: Theme.of(context).primaryColor,
             text: 'Category',
           ),
           GButton(
             icon: Icons.bookmark,
-            iconActiveColor: Theme.of(context).primaryColor,
             text: 'Bookmark',
+          ),
+          GButton(
+            icon: Icons.settings,
+            text: 'Settings',
           ),
         ],
       ),

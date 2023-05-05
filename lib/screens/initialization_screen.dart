@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../globals.dart';
 import '../screens/home_screen.dart';
 import '../screens/onboarding_screen.dart';
 
@@ -35,13 +35,11 @@ class _InitializationScreenState extends State<InitializationScreen> {
   bool isIntroduced = false;
 
   Future<void> _getIntroductionState() async {
-    final prefs = await SharedPreferences.getInstance();
-
     setState(() {
-      isIntroduced = prefs.getBool('isIntroduced') ?? false;
+      isIntroduced = introBox!.get('isIntroduced') ?? false;
     });
 
-    debugPrint('prefs: ${prefs.getBool('isIntroduced')}');
+    debugPrint('introBox: ${introBox!.get('isIntroduced')}');
     debugPrint('isIntroduced: $isIntroduced');
   }
 

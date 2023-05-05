@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
+import '/theme.dart';
 
 class FailedState extends StatelessWidget {
   const FailedState({
@@ -27,8 +28,7 @@ class FailedState extends StatelessWidget {
           ),
           Text(
             stateText,
-            style: TextStyle(
-              color: FlavorConfig.instance.variables['appBlack'],
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
             ),
@@ -39,8 +39,9 @@ class FailedState extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  FlavorConfig.instance.variables['appPrimaryAccentColor'],
+              backgroundColor: AppTheme.isDark
+                  ? FlavorConfig.instance.variables['appDarkPrimaryAccentColor']
+                  : FlavorConfig.instance.variables['appPrimaryAccentColor'],
               elevation: 0,
               surfaceTintColor: Colors.transparent,
               shadowColor: Colors.transparent,
