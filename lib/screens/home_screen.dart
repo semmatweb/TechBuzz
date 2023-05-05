@@ -2,12 +2,12 @@ import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:ini_news_flutter/screens/settings_screen.dart';
-import 'package:ini_news_flutter/theme.dart';
-import '../screens/search_result_screen.dart';
-import '../screens/home_tab.dart';
-import '../screens/category_tab.dart';
 import '../screens/bookmark_tab.dart';
+import '../screens/category_tab.dart';
+import '../screens/home_tab.dart';
+import '../screens/search_result_screen.dart';
+import '../screens/settings_screen.dart';
+import '../theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ini_news_flutter/globals.dart';
+import '../globals.dart';
 
 class AppTheme with ChangeNotifier {
   static bool isDark = false;

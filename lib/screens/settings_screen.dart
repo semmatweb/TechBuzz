@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
-import 'package:ini_news_flutter/globals.dart';
-import 'package:ini_news_flutter/theme.dart';
+import '../globals.dart';
+import '../theme.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

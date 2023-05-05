@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
-import 'package:ini_news_flutter/theme.dart';
+import '/theme.dart';
 
 class RefreshState extends StatelessWidget {
   const RefreshState({

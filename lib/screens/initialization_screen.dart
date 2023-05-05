@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:ini_news_flutter/globals.dart';
+import '../globals.dart';
 import '../screens/home_screen.dart';
 import '../screens/onboarding_screen.dart';
 

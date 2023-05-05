@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
-import 'package:ini_news_flutter/theme.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import '../theme.dart';
 
 class PostItem extends StatelessWidget {
   const PostItem({

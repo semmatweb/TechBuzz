@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
-import 'package:ini_news_flutter/globals.dart';
-import 'package:ini_news_flutter/theme.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import '../globals.dart';
+import '../theme.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
