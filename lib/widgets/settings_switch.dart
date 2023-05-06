@@ -5,11 +5,17 @@ import 'package:ini_news_flutter/theme.dart';
 class SettingsSwitch extends StatelessWidget {
   const SettingsSwitch({
     super.key,
+    required this.icon,
+    required this.iconForegroundColor,
+    required this.iconBackgroundColor,
     required this.switchName,
     required this.switchValue,
     required this.onChanged,
   });
 
+  final IconData icon;
+  final Color iconForegroundColor;
+  final Color iconBackgroundColor;
   final String switchName;
   final bool switchValue;
   final void Function(bool)? onChanged;
@@ -19,11 +25,21 @@ class SettingsSwitch extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          switchName,
-          style: const TextStyle(
-            fontWeight: FontWeight.w700,
-          ),
+        Row(
+          children: [
+            CircleAvatar(
+              foregroundColor: iconForegroundColor,
+              backgroundColor: iconBackgroundColor,
+              child: Icon(icon),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              switchName,
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
         ),
         Switch(
           value: switchValue,
@@ -31,8 +47,12 @@ class SettingsSwitch extends StatelessWidget {
           activeTrackColor: AppTheme.isDark
               ? FlavorConfig.instance.variables['appDarkPrimaryAccentColor']
               : Theme.of(context).primaryColor,
-          inactiveThumbColor: FlavorConfig.instance.variables['appGrey'],
-          inactiveTrackColor: FlavorConfig.instance.variables['appLightGrey'],
+          inactiveThumbColor: AppTheme.isDark
+              ? Theme.of(context).iconTheme.color
+              : FlavorConfig.instance.variables['appGrey'],
+          inactiveTrackColor: AppTheme.isDark
+              ? Theme.of(context).canvasColor
+              : FlavorConfig.instance.variables['appLightGrey'],
           splashRadius: 50.0,
           onChanged: onChanged,
         )

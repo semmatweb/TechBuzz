@@ -4,6 +4,7 @@ import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:ini_news_flutter/globals.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -51,9 +52,16 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   void initState() {
     super.initState();
+    _getArticleSettings();
     _checkBookmarkData();
     _loadInterstitialAd();
     _fetchedPostDetail = _controller.getPostDetail(widget.postID);
+  }
+
+  Future<void> _getArticleSettings() async {
+    if (articleBox?.get('articleFontSize') == null) {
+      await articleBox?.put('articleFontSize', 16.0);
+    }
   }
 
   void _checkBookmarkData() async {
@@ -482,8 +490,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     const SizedBox(height: 20),
                     HtmlWidget(
                       postDetailData.content.rendered,
-                      textStyle: const TextStyle(
-                        fontSize: 16,
+                      textStyle: TextStyle(
+                        fontSize: articleBox!.get('articleFontSize'),
                         fontWeight: FontWeight.w500,
                       ),
                       enableCaching: true,
