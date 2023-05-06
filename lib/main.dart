@@ -19,6 +19,7 @@ Future<void> main() async {
   introBox = await Hive.openBox('introductionState');
   themeBox = await Hive.openBox('themeState');
   notifBox = await Hive.openBox('notifState');
+  articleBox = await Hive.openBox('articleSettings');
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -135,6 +136,10 @@ class _MyAppState extends State<MyApp> {
             fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
             color: FlavorConfig.instance.variables['appGrey'],
           ),
+          displayMedium: TextStyle(
+            fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
+            color: FlavorConfig.instance.variables['appLightGrey'],
+          ),
         ),
         iconTheme: IconThemeData(
           color: FlavorConfig.instance.variables['appGrey'],
@@ -142,6 +147,7 @@ class _MyAppState extends State<MyApp> {
         dividerTheme: DividerThemeData(
           color: FlavorConfig.instance.variables['appLightGrey'],
         ),
+        cardTheme: const CardTheme(surfaceTintColor: Colors.transparent),
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
@@ -181,6 +187,10 @@ class _MyAppState extends State<MyApp> {
             fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
             color: const Color.fromARGB(255, 12, 12, 12),
           ),
+          displayMedium: TextStyle(
+            fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
+            color: const Color.fromARGB(255, 12, 12, 12),
+          ),
         ),
         iconTheme: const IconThemeData(
           color: Color.fromARGB(255, 140, 140, 140),
@@ -188,6 +198,7 @@ class _MyAppState extends State<MyApp> {
         dividerTheme: const DividerThemeData(
           color: Color.fromARGB(255, 40, 40, 40),
         ),
+        cardTheme: const CardTheme(surfaceTintColor: Colors.transparent),
       ),
       navigatorKey: appNavigator,
       initialRoute: '/',

@@ -10,3 +10,4 @@ AppTheme currentTheme = AppTheme();
 Box? introBox;
 Box? themeBox;
 Box? notifBox;
+Box? articleBox;

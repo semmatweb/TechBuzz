@@ -64,6 +64,7 @@ dependencies:
   onesignal_flutter: ^3.5.1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  dropdown_textfield: ^1.0.8
 
 dev_dependencies:
   flutter_test:
