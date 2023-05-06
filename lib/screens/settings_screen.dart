@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flavor/flutter_flavor.dart';
+import 'package:ini_news_flutter/widgets/settings_switch.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import '../globals.dart';
 import '../theme.dart';
 
@@ -12,11 +13,13 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool isDarkMode = AppTheme.isDark;
+  bool isNotifEnabled = notifBox?.get('enablePushNotification') ?? false;
 
   @override
   void initState() {
     super.initState();
     _getThemeState();
+    _getPushNotifState();
     debugPrint('AppTheme.isDark: ${AppTheme.isDark}');
   }
 
@@ -34,45 +37,90 @@ class _SettingsScreenState extends State<SettingsScreen> {
     debugPrint('isDarkMode: $isDarkMode');
   }
 
+  Future<void> _getPushNotifState() async {
+    await OneSignal.shared.getDeviceState().then((deviceState) {
+      debugPrint(
+          "Is device has notification permission: ${deviceState!.hasNotificationPermission}");
+
+      if (!deviceState.hasNotificationPermission) {
+        setState(() {
+          isNotifEnabled = false;
+          notifBox!.put('enablePushNotification', false);
+        });
+      } else {
+        setState(() {
+          isNotifEnabled = notifBox!.get('enablePushNotification') ?? false;
+        });
+      }
+    });
+
+    debugPrint('notifBox: ${notifBox!.get('enablePushNotification')}');
+    debugPrint('isNotifEnabled: $isNotifEnabled');
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Dark Mode',
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            Switch(
-              value: isDarkMode,
-              activeColor: Colors.white,
-              activeTrackColor: AppTheme.isDark
-                  ? FlavorConfig.instance.variables['appDarkPrimaryAccentColor']
-                  : Theme.of(context).primaryColor,
-              inactiveThumbColor: FlavorConfig.instance.variables['appGrey'],
-              inactiveTrackColor:
-                  FlavorConfig.instance.variables['appLightGrey'],
-              splashRadius: 50.0,
-              onChanged: (value) async {
-                currentTheme.switchTheme();
+        SettingsSwitch(
+          switchName: 'Dark Mode',
+          switchValue: isDarkMode,
+          onChanged: (value) async {
+            currentTheme.switchTheme();
 
-                setState(() {
-                  isDarkMode = !isDarkMode;
-                  themeBox!.put('isDarkMode', isDarkMode);
-                });
+            setState(() {
+              isDarkMode = !isDarkMode;
+              themeBox!.put('isDarkMode', isDarkMode);
+            });
 
-                debugPrint('AppTheme.isDark: ${AppTheme.isDark}');
+            debugPrint('AppTheme.isDark: ${AppTheme.isDark}');
+            debugPrint('isDarkMode themeBox: ${themeBox!.get('isDarkMode')}');
+            debugPrint('isDarkMode: $isDarkMode');
+          },
+        ),
+        SettingsSwitch(
+          switchName: 'Push Notification',
+          switchValue: isNotifEnabled,
+          onChanged: (value) async {
+            await OneSignal.shared.getDeviceState().then(
+              (deviceState) async {
                 debugPrint(
-                    'isDarkMode themeBox: ${themeBox!.get('isDarkMode')}');
-                debugPrint('isDarkMode: $isDarkMode');
+                    "Is device has notification permission: ${deviceState!.hasNotificationPermission}");
+
+                if (isNotifEnabled == false &&
+                    !deviceState.hasNotificationPermission) {
+                  await OneSignal.shared
+                      .promptUserForPushNotificationPermission()
+                      .then(
+                    (promptResult) {
+                      setState(() {
+                        isNotifEnabled = promptResult;
+                        notifBox!.put('enablePushNotification', promptResult);
+                      });
+
+                      debugPrint("Accepted permission: $promptResult");
+                      debugPrint(
+                          'notifBox: ${notifBox!.get('enablePushNotification')}');
+                    },
+                  );
+                } else {
+                  OneSignal.shared.disablePush(!value);
+
+                  debugPrint('isPushDisabled: ${!deviceState.pushDisabled}');
+
+                  setState(() {
+                    isNotifEnabled = value;
+                    notifBox!.put('enablePushNotification', value);
+                  });
+                }
+
+                debugPrint('isNotifEnabled: $isNotifEnabled');
+                debugPrint(
+                    'notifBox: ${notifBox!.get('enablePushNotification')}');
               },
-            )
-          ],
+            );
+          },
         ),
       ],
     );
