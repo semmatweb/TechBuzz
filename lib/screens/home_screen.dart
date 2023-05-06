@@ -2,6 +2,8 @@ import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:ini_news_flutter/globals.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import '../screens/bookmark_tab.dart';
 import '../screens/category_tab.dart';
 import '../screens/home_tab.dart';
@@ -17,6 +19,29 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _pushNotificationPrompt();
+  }
+
+  Future<void> _pushNotificationPrompt() async {
+    await OneSignal.shared.getDeviceState().then((deviceState) async {
+      debugPrint(
+          "Is device has notification permission: ${deviceState!.hasNotificationPermission}");
+
+      if (!deviceState.hasNotificationPermission) {
+        await OneSignal.shared
+            .promptUserForPushNotificationPermission()
+            .then((promptResult) {
+          notifBox!.put('enablePushNotification', promptResult);
+          debugPrint("Accepted permission: $promptResult");
+          debugPrint('notifBox: ${notifBox!.get('enablePushNotification')}');
+        });
+      }
+    });
+  }
+
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {

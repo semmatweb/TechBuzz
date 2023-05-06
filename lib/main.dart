@@ -18,6 +18,7 @@ Future<void> main() async {
   await Hive.initFlutter();
   introBox = await Hive.openBox('introductionState');
   themeBox = await Hive.openBox('themeState');
+  notifBox = await Hive.openBox('notifState');
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -27,9 +28,6 @@ Future<void> main() async {
 
   // OneSignal
   OneSignal.shared.setAppId("1f41b0aa-54fe-4ffc-80ae-73aecc2334ea");
-  OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
-    debugPrint("Accepted permission: $accepted");
-  });
 
   OneSignal.shared
       .setNotificationOpenedHandler((OSNotificationOpenedResult result) {

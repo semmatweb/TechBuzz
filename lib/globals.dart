@@ -9,3 +9,4 @@ GlobalKey<NavigatorState>? appNavigator;
 AppTheme currentTheme = AppTheme();
 Box? introBox;
 Box? themeBox;
+Box? notifBox;
