@@ -136,10 +136,6 @@ class _MyAppState extends State<MyApp> {
             fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
             color: FlavorConfig.instance.variables['appGrey'],
           ),
-          displayMedium: TextStyle(
-            fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
-            color: FlavorConfig.instance.variables['appLightGrey'],
-          ),
         ),
         iconTheme: IconThemeData(
           color: FlavorConfig.instance.variables['appGrey'],
@@ -185,11 +181,7 @@ class _MyAppState extends State<MyApp> {
           ),
           displayLarge: TextStyle(
             fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
-            color: const Color.fromARGB(255, 12, 12, 12),
-          ),
-          displayMedium: TextStyle(
-            fontFamily: FlavorConfig.instance.variables['appDefaultFont'],
-            color: const Color.fromARGB(255, 12, 12, 12),
+            color: const Color.fromARGB(255, 40, 40, 40),
           ),
         ),
         iconTheme: const IconThemeData(

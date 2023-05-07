@@ -103,6 +103,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       : FlavorConfig.instance.variables['appLightGrey'],
               switchName: 'Dark Mode',
               switchValue: isDarkMode,
+              switchDarkTrackColor: Colors.orange[300],
               onChanged: (value) async {
                 currentTheme.switchTheme();
 
