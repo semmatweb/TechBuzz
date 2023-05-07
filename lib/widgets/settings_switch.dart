@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
-import 'package:ini_news_flutter/theme.dart';
+import '../theme.dart';
 
 class SettingsSwitch extends StatelessWidget {
   const SettingsSwitch({
     super.key,
-    required this.icon,
-    required this.iconForegroundColor,
-    required this.iconBackgroundColor,
-    required this.switchName,
+    required this.settingicon,
+    required this.settingIconForegroundColor,
+    required this.settingIconBackgroundColor,
+    required this.settingName,
     required this.switchValue,
     this.switchLightTrackColor,
     this.switchDarkTrackColor,
     required this.onChanged,
   });
 
-  final IconData icon;
-  final Color iconForegroundColor;
-  final Color iconBackgroundColor;
-  final String switchName;
+  final IconData settingicon;
+  final Color settingIconForegroundColor;
+  final Color settingIconBackgroundColor;
+  final String settingName;
   final bool switchValue;
   final Color? switchLightTrackColor;
   final Color? switchDarkTrackColor;
@@ -32,13 +32,13 @@ class SettingsSwitch extends StatelessWidget {
         Row(
           children: [
             CircleAvatar(
-              foregroundColor: iconForegroundColor,
-              backgroundColor: iconBackgroundColor,
-              child: Icon(icon),
+              foregroundColor: settingIconForegroundColor,
+              backgroundColor: settingIconBackgroundColor,
+              child: Icon(settingicon),
             ),
             const SizedBox(width: 10),
             Text(
-              switchName,
+              settingName,
               style: const TextStyle(
                 fontWeight: FontWeight.w700,
               ),
