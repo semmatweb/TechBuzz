@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
+import '/theme.dart';
 
 class RefreshState extends StatelessWidget {
   const RefreshState({
@@ -15,8 +16,9 @@ class RefreshState extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              FlavorConfig.instance.variables['appPrimaryAccentColor'],
+          backgroundColor: AppTheme.isDark
+              ? FlavorConfig.instance.variables['appDarkPrimaryAccentColor']
+              : FlavorConfig.instance.variables['appPrimaryAccentColor'],
           elevation: 0,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
