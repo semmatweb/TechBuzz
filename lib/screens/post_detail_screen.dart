@@ -290,10 +290,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     return Container(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.width / 1.5,
-                      color: FlavorConfig.instance.variables['appLightGrey'],
+                      color: Theme.of(context).dividerTheme.color,
                       child: Center(
                         child: LoadingAnimationWidget.prograssiveDots(
-                          color: FlavorConfig.instance.variables['appGrey'],
+                          color: Theme.of(context).iconTheme.color!,
                           size: 50,
                         ),
                       ),
@@ -303,9 +303,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     return Container(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.width / 1.5,
-                      color: FlavorConfig.instance.variables['appLightGrey'],
+                      color: Theme.of(context).dividerTheme.color,
                       child: const Center(
-                        child: Icon(Icons.error, size: 50),
+                        child: Icon(
+                          Icons.error,
+                          color: Colors.red,
+                          size: 50,
+                        ),
                       ),
                     );
                   },

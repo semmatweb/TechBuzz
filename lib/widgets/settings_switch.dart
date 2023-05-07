@@ -10,6 +10,8 @@ class SettingsSwitch extends StatelessWidget {
     required this.iconBackgroundColor,
     required this.switchName,
     required this.switchValue,
+    this.switchLightTrackColor,
+    this.switchDarkTrackColor,
     required this.onChanged,
   });
 
@@ -18,6 +20,8 @@ class SettingsSwitch extends StatelessWidget {
   final Color iconBackgroundColor;
   final String switchName;
   final bool switchValue;
+  final Color? switchLightTrackColor;
+  final Color? switchDarkTrackColor;
   final void Function(bool)? onChanged;
 
   @override
@@ -45,8 +49,9 @@ class SettingsSwitch extends StatelessWidget {
           value: switchValue,
           activeColor: Colors.white,
           activeTrackColor: AppTheme.isDark
-              ? FlavorConfig.instance.variables['appDarkPrimaryAccentColor']
-              : Theme.of(context).primaryColor,
+              ? switchDarkTrackColor ??
+                  FlavorConfig.instance.variables['appDarkPrimaryAccentColor']
+              : switchLightTrackColor ?? Theme.of(context).primaryColor,
           inactiveThumbColor: AppTheme.isDark
               ? Theme.of(context).iconTheme.color
               : FlavorConfig.instance.variables['appGrey'],
