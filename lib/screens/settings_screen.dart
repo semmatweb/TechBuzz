@@ -1,12 +1,12 @@
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
-import 'package:ini_news_flutter/widgets/settings_link.dart';
-import 'package:ini_news_flutter/widgets/settings_segment.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import '../globals.dart';
 import '../theme.dart';
 import '../widgets/settings_dropdown.dart';
+import '../widgets/settings_link.dart';
+import '../widgets/settings_segment.dart';
 import '../widgets/settings_switch.dart';
 
 class SettingsScreen extends StatefulWidget {

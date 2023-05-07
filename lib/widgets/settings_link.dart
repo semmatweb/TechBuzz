@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
-import 'package:ini_news_flutter/theme.dart';
+import '../theme.dart';
 
 class SettingsLink extends StatelessWidget {
   const SettingsLink({
