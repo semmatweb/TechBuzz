@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -197,6 +198,19 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => const InitializationScreen(),
       },
+      localizationsDelegates: const [
+        GlobalCupertinoLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('ar', 'AE'),
+        Locale('fa', 'IR'),
+        Locale('he', 'IL'),
+        Locale('ps', 'AF'),
+        Locale('ur', 'PK'),
+      ],
     );
   }
 }
