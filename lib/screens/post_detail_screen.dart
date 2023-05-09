@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
-import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter/material.dart';
+import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -11,8 +12,9 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:flutter_web_browser/flutter_web_browser.dart';
+import 'package:facebook_audience_network/facebook_audience_network.dart';
 import '../ad_helper.dart';
+import '../fb_ad_helper.dart';
 import '../globals.dart';
 import '../controllers/bookmark_controller.dart';
 import '../controllers/post_detail_controller.dart';
@@ -55,6 +57,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     _getArticleSettings();
     _checkBookmarkData();
     _loadInterstitialAd();
+    _loadFBInterstitialAd();
+    _loadFBBannerAd();
     _fetchedPostDetail = _controller.getPostDetail(widget.postID);
   }
 
@@ -112,6 +116,65 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         },
       ),
     );
+  }
+
+  bool _isFBInterstitialAdLoaded = false;
+
+  void _loadFBInterstitialAd() {
+    FacebookInterstitialAd.loadInterstitialAd(
+      placementId: FBAdHelper.interstitialAdPlacementId,
+      listener: (result, value) {
+        debugPrint('>> FAN > Interstitial Ad: $result --> $value');
+        if (result == InterstitialAdResult.LOADED) {
+          setState(() {
+            _isFBInterstitialAdLoaded = true;
+          });
+        }
+
+        if (result == InterstitialAdResult.ERROR &&
+            value['invalidated'] == true) {
+          setState(() {
+            _isFBInterstitialAdLoaded = false;
+          });
+          _loadFBInterstitialAd();
+        }
+
+        if (result == InterstitialAdResult.DISMISSED &&
+            value['invalidated'] == true) {
+          setState(() {
+            _isFBInterstitialAdLoaded = false;
+          });
+          _loadFBInterstitialAd();
+        }
+      },
+    );
+  }
+
+  Widget _facebookBannerAd = const SizedBox.shrink();
+
+  void _loadFBBannerAd() {
+    setState(() {
+      _facebookBannerAd = Column(
+        children: [
+          const SizedBox(height: 20),
+          FacebookBannerAd(
+            bannerSize: BannerSize.STANDARD,
+            keepAlive: true,
+            placementId: FBAdHelper.bannerAdPlacementId,
+            listener: (result, value) {
+              debugPrint("Banner Ad: $result -->  $value");
+              if (result == BannerAdResult.ERROR &&
+                  value["invalidated"] == true) {
+                setState(() {
+                  _facebookBannerAd = const SizedBox.shrink();
+                });
+              }
+            },
+          ),
+        ],
+      );
+    });
+    debugPrint('facebookBannerAd = $_facebookBannerAd');
   }
 
   @override
@@ -208,14 +271,36 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           );
         }
 
+        Widget postDetailBannerAd() {
+          if (FlavorConfig.instance.variables['adProvider'] == 'Google AdMob') {
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return const PostBannerAdMob();
+              },
+            );
+          } else {
+            return _facebookBannerAd;
+          }
+        }
+
         return WillPopScope(
           onWillPop: () async {
-            if (_interstitialAd == null) {
-              _loadInterstitialAd();
-            }
+            if (FlavorConfig.instance.variables['adProvider'] ==
+                'Google AdMob') {
+              if (_interstitialAd == null) {
+                _loadInterstitialAd();
+              }
 
-            if (_interstitialAd != null) {
-              await _interstitialAd!.show();
+              if (_interstitialAd != null) {
+                await _interstitialAd!.show();
+              }
+            } else if (FlavorConfig.instance.variables['adProvider'] ==
+                'Facebook Ads') {
+              if (_isFBInterstitialAdLoaded == true) {
+                await FacebookInterstitialAd.showInterstitialAd(delay: 2000);
+              } else {
+                debugPrint("Interstial Ad not yet loaded!");
+              }
             }
 
             Future.delayed(
@@ -252,12 +337,23 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   color: Colors.white,
                 ),
                 onPressed: () async {
-                  if (_interstitialAd == null) {
-                    _loadInterstitialAd();
-                  }
+                  if (FlavorConfig.instance.variables['adProvider'] ==
+                      'Google AdMob') {
+                    if (_interstitialAd == null) {
+                      _loadInterstitialAd();
+                    }
 
-                  if (_interstitialAd != null) {
-                    await _interstitialAd!.show();
+                    if (_interstitialAd != null) {
+                      await _interstitialAd!.show();
+                    }
+                  } else if (FlavorConfig.instance.variables['adProvider'] ==
+                      'Facebook Ads') {
+                    if (_isFBInterstitialAdLoaded == true) {
+                      await FacebookInterstitialAd.showInterstitialAd(
+                          delay: 2000);
+                    } else {
+                      debugPrint("Interstial Ad not yet loaded!");
+                    }
                   }
 
                   if (!mounted) return;
@@ -524,11 +620,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       },
                     ),
                     PostTag(postID: widget.postID),
-                    StatefulBuilder(
-                      builder: (context, setState) {
-                        return const PostBannerAdMob();
-                      },
-                    ),
+                    postDetailBannerAd(),
                     RelatedPost(
                       categoryID: postDetailData.postTerms.first.id,
                       postKeyword: parsedTitleString.split('').first,

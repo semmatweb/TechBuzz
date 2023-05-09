@@ -1,8 +1,11 @@
+import 'package:facebook_audience_network/facebook_audience_network.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:html/parser.dart' show parse;
+import '../fb_ad_helper.dart';
 import '../controllers/post_controller.dart';
 import '../models/menu_model.dart';
 import '../models/post_model.dart';
@@ -184,6 +187,41 @@ class PostTab extends StatefulWidget {
 
 class _PostTabState extends State<PostTab> {
   @override
+  void initState() {
+    super.initState();
+    debugPrint('PostTab initState fired');
+    _loadFBBannerAd();
+  }
+
+  Widget _facebookBannerAd = const SizedBox(height: 30);
+
+  void _loadFBBannerAd() {
+    setState(() {
+      _facebookBannerAd = Column(
+        children: [
+          const SizedBox(height: 25),
+          FacebookBannerAd(
+            bannerSize: BannerSize.STANDARD,
+            keepAlive: true,
+            placementId: FBAdHelper.bannerAdPlacementId,
+            listener: (result, value) {
+              debugPrint("Banner Ad: $result -->  $value");
+              if (result == BannerAdResult.ERROR &&
+                  value["invalidated"] == true) {
+                setState(() {
+                  _facebookBannerAd = const SizedBox(height: 30);
+                });
+              }
+            },
+          ),
+          const SizedBox(height: 25),
+        ],
+      );
+    });
+    debugPrint('facebookBannerAd = $_facebookBannerAd');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () => Future.sync(() => widget.pagingController.refresh()),
@@ -284,11 +322,16 @@ class _PostTabState extends State<PostTab> {
         ),
         separatorBuilder: (context, index) {
           if (index == 5) {
-            return StatefulBuilder(
-              builder: (context, setState) {
-                return const BannerAdMob();
-              },
-            );
+            if (FlavorConfig.instance.variables['adProvider'] ==
+                'Google AdMob') {
+              return StatefulBuilder(
+                builder: (context, setState) {
+                  return const BannerAdMob();
+                },
+              );
+            } else {
+              return _facebookBannerAd;
+            }
           } else {
             return const SizedBox(height: 30);
           }
