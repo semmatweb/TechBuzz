@@ -200,22 +200,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 30),
             const SettingsSegment(segmentName: 'Info'),
             const SizedBox(height: 15),
-            const SettingsLink(
-              settingName: 'Terms and Condition',
+            SettingsLink(
+              settingName: 'Terms and Conditions',
               settingIcon: Icons.feed,
-              linkUrl: 'https://dummycontent.inito.dev/',
+              linkUrl: FlavorConfig.instance.variables['termsAndConditionsUrl'],
             ),
             const SizedBox(height: 15),
-            const SettingsLink(
+            SettingsLink(
               settingName: 'Privacy Policy',
               settingIcon: Icons.policy,
-              linkUrl: 'https://dummycontent.inito.dev/',
+              linkUrl: FlavorConfig.instance.variables['privacyPolicyUrl'],
             ),
             const SizedBox(height: 15),
-            const SettingsLink(
+            SettingsLink(
               settingName: 'Contact Us',
               settingIcon: Icons.phone,
-              linkUrl: 'https://initodev.freshdesk.com/support/tickets/new',
+              linkUrl: FlavorConfig.instance.variables['contactUsUrl'],
             ),
           ],
         ),

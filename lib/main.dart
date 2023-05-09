@@ -1,3 +1,4 @@
+import 'package:facebook_audience_network/facebook_audience_network.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
@@ -30,7 +31,6 @@ Future<void> main() async {
 
   // OneSignal
   OneSignal.shared.setAppId("1f41b0aa-54fe-4ffc-80ae-73aecc2334ea");
-
   OneSignal.shared
       .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
     var notifData = result.notification;
@@ -44,17 +44,25 @@ Future<void> main() async {
     );
   });
 
-  // AdMob
+  // Google AdMob
   MobileAds.instance.initialize();
   RequestConfiguration configuration =
       RequestConfiguration(testDeviceIds: ["03ECFD73D1A81042944D176D4DE6C0EA"]);
   MobileAds.instance.updateRequestConfiguration(configuration);
+
+  // Facebook Ads
+  FacebookAudienceNetwork.init(
+    testingId: "0c0b2cb3-6217-4263-92e0-0e3ccf57902f",
+  );
 
   // App-wide Config
   FlavorConfig(
     variables: {
       'apiBaseUrl': 'https://dummycontent.inito.dev/wp-json/wp/v2',
       'appName': 'iniNews',
+      //By default, this app use 'adProvider': 'Google AdMob' as its ad provider, you can change between Facebook Ads or Google AdMob as your preferred ad provider
+      //Change to 'adProvider: 'Facebook Ads' if you want to use Facebook Ads instead
+      'adProvider': 'Google AdMob',
       'appDefaultFont': 'Inter',
       'appPrimarySwatch': Colors.indigo,
       'appPrimaryColor': const Color.fromARGB(255, 60, 95, 150),
@@ -70,6 +78,9 @@ Future<void> main() async {
       'appGrey': const Color.fromARGB(255, 192, 192, 192),
       'appDarkGrey': const Color.fromARGB(255, 114, 114, 114),
       'appBlack': const Color.fromARGB(255, 54, 54, 54),
+      'termsAndConditionsUrl': 'https://dummycontent.inito.dev/',
+      'privacyPolicyUrl': 'https://dummycontent.inito.dev/',
+      'contactUsUrl': 'https://initodev.freshdesk.com/support/tickets/new',
     },
   );
   runApp(const MyApp());

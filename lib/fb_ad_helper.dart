@@ -1,21 +1,21 @@
 import 'dart:io';
 
-class AdHelper {
-  static String get bannerAdUnitId {
+class FBAdHelper {
+  static String get bannerAdPlacementId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3277946216094091/4462720468';
+      return '254979900341757_254995493673531';
     } else if (Platform.isIOS) {
-      return 'YOUR_UNIT_ID';
+      return 'YOUR_PLACEMENT_ID';
     } else {
       throw UnsupportedError('Unsupported platform');
     }
   }
 
-  static String get interstitialAdUnitId {
+  static String get interstitialAdPlacementId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3277946216094091/7476515165';
+      return '254979900341757_254994077007006';
     } else if (Platform.isIOS) {
-      return 'YOUR_UNIT_ID';
+      return 'YOUR_PLACEMENT_ID';
     } else {
       throw UnsupportedError('Unsupported platform');
     }
