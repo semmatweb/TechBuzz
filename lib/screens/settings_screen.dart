@@ -1,6 +1,8 @@
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
+import 'package:flutter_web_browser/flutter_web_browser.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import '../globals.dart';
 import '../theme.dart';
@@ -201,21 +203,65 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SettingsSegment(segmentName: 'Info'),
             const SizedBox(height: 15),
             SettingsLink(
+              settingName: 'Review Our App',
+              settingIcon: Icons.star_half,
+              onPressed: () async {
+                final InAppReview inAppReview = InAppReview.instance;
+
+                if (await inAppReview.isAvailable()) {
+                  inAppReview.requestReview();
+                }
+              },
+            ),
+            const SizedBox(height: 15),
+            const Divider(thickness: 2),
+            const SizedBox(height: 15),
+            SettingsLink(
               settingName: 'Terms and Conditions',
               settingIcon: Icons.feed,
-              linkUrl: FlavorConfig.instance.variables['termsAndConditionsUrl'],
+              onPressed: () {
+                FlutterWebBrowser.openWebPage(
+                  url: FlavorConfig.instance.variables['termsAndConditionsUrl'],
+                  customTabsOptions: CustomTabsOptions(
+                    defaultColorSchemeParams: CustomTabsColorSchemeParams(
+                      toolbarColor: Theme.of(context).primaryColor,
+                    ),
+                    showTitle: true,
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 15),
             SettingsLink(
               settingName: 'Privacy Policy',
               settingIcon: Icons.policy,
-              linkUrl: FlavorConfig.instance.variables['privacyPolicyUrl'],
+              onPressed: () {
+                FlutterWebBrowser.openWebPage(
+                  url: FlavorConfig.instance.variables['privacyPolicyUrl'],
+                  customTabsOptions: CustomTabsOptions(
+                    defaultColorSchemeParams: CustomTabsColorSchemeParams(
+                      toolbarColor: Theme.of(context).primaryColor,
+                    ),
+                    showTitle: true,
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 15),
             SettingsLink(
               settingName: 'Contact Us',
               settingIcon: Icons.phone,
-              linkUrl: FlavorConfig.instance.variables['contactUsUrl'],
+              onPressed: () {
+                FlutterWebBrowser.openWebPage(
+                  url: FlavorConfig.instance.variables['contactUsUrl'],
+                  customTabsOptions: CustomTabsOptions(
+                    defaultColorSchemeParams: CustomTabsColorSchemeParams(
+                      toolbarColor: Theme.of(context).primaryColor,
+                    ),
+                    showTitle: true,
+                  ),
+                );
+              },
             ),
           ],
         ),
