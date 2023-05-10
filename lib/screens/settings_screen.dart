@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import '../globals.dart';
 import '../theme.dart';
@@ -48,7 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _getPushNotifState() async {
     await OneSignal.shared.getDeviceState().then((deviceState) {
       debugPrint(
-          "Is device has notification permission: ${deviceState!.hasNotificationPermission}");
+          "hasNotifPermission: ${deviceState!.hasNotificationPermission}");
 
       if (!deviceState.hasNotificationPermission) {
         setState(() {
@@ -74,6 +77,82 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget checkForUpdateWidget() {
+      if (Platform.isAndroid) {
+        return Column(
+          children: [
+            SettingsLink(
+                settingName: 'Check For Update',
+                settingIcon: Icons.upcoming,
+                onPressed: () {
+                  InAppUpdate.checkForUpdate().then((updateInfo) {
+                    if (updateInfo.updateAvailability ==
+                        UpdateAvailability.updateAvailable) {
+                      if (updateInfo.flexibleUpdateAllowed) {
+                        InAppUpdate.startFlexibleUpdate().then(
+                          (appUpdateResult) {
+                            if (appUpdateResult == AppUpdateResult.success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Update download complete',
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .color,
+                                    ),
+                                  ),
+                                  backgroundColor: AppTheme.isDark
+                                      ? FlavorConfig.instance.variables[
+                                          'appDarkPrimaryAccentColor']
+                                      : FlavorConfig.instance
+                                          .variables['appPrimaryAccentColor'],
+                                  duration: const Duration(minutes: 1),
+                                  action: SnackBarAction(
+                                    label: 'Install',
+                                    textColor: Theme.of(context).primaryColor,
+                                    onPressed: () {
+                                      InAppUpdate.completeFlexibleUpdate();
+                                    },
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      } else if (updateInfo.immediateUpdateAllowed) {
+                        InAppUpdate.performImmediateUpdate();
+                      }
+                    } else if (updateInfo.updateAvailability ==
+                        UpdateAvailability.updateNotAvailable) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No update available'),
+                          backgroundColor: Colors.black,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    } else if (updateInfo.updateAvailability ==
+                        UpdateAvailability.unknown) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Update availability unknown'),
+                          backgroundColor: Colors.black,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  });
+                }),
+            const SizedBox(height: 15),
+          ],
+        );
+      } else {
+        return const SizedBox.shrink();
+      }
+    }
+
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -137,7 +216,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 await OneSignal.shared.getDeviceState().then(
                   (deviceState) async {
                     debugPrint(
-                        "Is device has notification permission: ${deviceState!.hasNotificationPermission}");
+                        "hasNotifPermission: ${deviceState!.hasNotificationPermission}");
 
                     if (isNotifEnabled == false &&
                         !deviceState.hasNotificationPermission) {
@@ -203,20 +282,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SettingsSegment(segmentName: 'Info'),
             const SizedBox(height: 15),
             SettingsLink(
-              settingName: 'Review Our App',
-              settingIcon: Icons.star_half,
-              onPressed: () async {
-                final InAppReview inAppReview = InAppReview.instance;
-
-                if (await inAppReview.isAvailable()) {
-                  inAppReview.requestReview();
-                }
-              },
-            ),
-            const SizedBox(height: 15),
-            const Divider(thickness: 2),
-            const SizedBox(height: 15),
-            SettingsLink(
               settingName: 'Terms and Conditions',
               settingIcon: Icons.feed,
               onPressed: () {
@@ -260,6 +325,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     showTitle: true,
                   ),
+                );
+              },
+            ),
+            const SizedBox(height: 30),
+            const SettingsSegment(segmentName: 'Other'),
+            const SizedBox(height: 15),
+            checkForUpdateWidget(),
+            SettingsLink(
+              settingName: 'Review App',
+              settingIcon: Icons.star_half,
+              onPressed: () async {
+                final InAppReview inAppReview = InAppReview.instance;
+
+                inAppReview.openStoreListing(
+                  appStoreId: Platform.isIOS
+                      ? FlavorConfig.instance.variables['appleAppStoreID']
+                      : null,
                 );
               },
             ),
