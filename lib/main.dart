@@ -81,6 +81,10 @@ Future<void> main() async {
       'termsAndConditionsUrl': 'https://dummycontent.inito.dev/',
       'privacyPolicyUrl': 'https://dummycontent.inito.dev/',
       'contactUsUrl': 'https://initodev.freshdesk.com/support/tickets/new',
+      //This appleAppStoreID is used for In-App Review.
+      //Only change this ID with your Apple ID in App Store Connect under "General > App Information > Apple ID" if you publish this app into App Store.
+      //Otherwise, leave it as it is.
+      'appleAppStoreID': 'YOUR_APPLE_ID',
     },
   );
   runApp(const MyApp());

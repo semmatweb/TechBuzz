@@ -245,7 +245,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Post bookmarked.'),
+              content: Text('Post bookmarked'),
               backgroundColor: Colors.black,
               duration: Duration(seconds: 2),
             ),
@@ -264,7 +264,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Post removed from bookmark.'),
+              content: Text('Post removed from bookmark'),
               backgroundColor: Colors.black,
               duration: Duration(seconds: 2),
             ),
