@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
-import 'package:flutter_web_browser/flutter_web_browser.dart';
 import '../theme.dart';
 
 class SettingsLink extends StatelessWidget {
@@ -8,12 +7,12 @@ class SettingsLink extends StatelessWidget {
     super.key,
     required this.settingName,
     required this.settingIcon,
-    required this.linkUrl,
+    required this.onPressed,
   });
 
   final String settingName;
   final IconData settingIcon;
-  final String linkUrl;
+  final void Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -39,17 +38,7 @@ class SettingsLink extends StatelessWidget {
           ],
         ),
         IconButton(
-          onPressed: () {
-            FlutterWebBrowser.openWebPage(
-              url: linkUrl,
-              customTabsOptions: CustomTabsOptions(
-                defaultColorSchemeParams: CustomTabsColorSchemeParams(
-                  toolbarColor: Theme.of(context).primaryColor,
-                ),
-                showTitle: true,
-              ),
-            );
-          },
+          onPressed: onPressed,
           icon: const Icon(Icons.open_in_new),
         )
       ],

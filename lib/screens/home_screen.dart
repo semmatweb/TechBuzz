@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _pushNotificationPrompt() async {
     await OneSignal.shared.getDeviceState().then((deviceState) async {
       debugPrint(
-          "Is device has notification permission: ${deviceState!.hasNotificationPermission}");
+          "hasNotifPermission: ${deviceState!.hasNotificationPermission}");
 
       if (!deviceState.hasNotificationPermission) {
         await OneSignal.shared
@@ -64,8 +64,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
           FlavorConfig.instance.variables['appName'].toString().toUpperCase(),

@@ -72,7 +72,7 @@ class _BookmarkTabState extends State<BookmarkTab> {
                   if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Post removed from bookmark.'),
+                      content: Text('Post removed from bookmark'),
                       backgroundColor: Colors.black,
                       duration: Duration(seconds: 2),
                     ),
