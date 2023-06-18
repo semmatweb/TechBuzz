@@ -47,7 +47,7 @@ class PostController {
         final nextPageKey = pageKey + 1;
         allPostController.appendPage(postList, nextPageKey);
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         debugPrint('PostController: Dio error!');
         debugPrint('PostController: STATUS: ${e.response?.statusCode}');
@@ -66,7 +66,7 @@ class PostController {
     try {
       final response = await dio.get('/menus');
       menu = Menu.fromJson(response.data);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         debugPrint('PostController: Dio error!');
         debugPrint('PostController: STATUS: ${e.response?.statusCode}');
@@ -111,7 +111,7 @@ class PostController {
         final nextPageKey = pageKey + 1;
         postPagingController.appendPage(postList, nextPageKey);
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         debugPrint('PostController: Dio error!');
         debugPrint('PostController: STATUS: ${e.response?.statusCode}');

@@ -25,7 +25,7 @@ class TagController {
 
       List? tagData = response.data;
       tagList = tagData!.map((e) => Tag.fromJson(e)).toList();
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         debugPrint('Dio error!');
         debugPrint('STATUS: ${e.response?.statusCode}');
@@ -61,7 +61,7 @@ class TagController {
         final nextPageKey = pageKey + 1;
         postPagingController.appendPage(postList, nextPageKey);
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         debugPrint('TagController: Dio error!');
         debugPrint('TagController: STATUS: ${e.response?.statusCode}');

@@ -25,7 +25,7 @@ class CategoryController {
 
       List? categoryData = response.data;
       categoryList = categoryData!.map((e) => Category.fromJson(e)).toList();
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         debugPrint('Dio error!');
         debugPrint('STATUS: ${e.response?.statusCode}');
@@ -61,7 +61,7 @@ class CategoryController {
         final nextPageKey = pageKey + 1;
         postPagingController.appendPage(postList, nextPageKey);
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         debugPrint('CategoryController: Dio error!');
         debugPrint('CategoryController: STATUS: ${e.response?.statusCode}');
