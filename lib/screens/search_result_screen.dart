@@ -3,7 +3,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:html/parser.dart' show parse;
-import '../controllers/search_controller.dart';
+import '../controllers/search_controller.dart' as search_ctrl;
 import '../models/post_model.dart';
 import '../screens/post_detail_screen.dart';
 import '../widgets/states/empty_state.dart';
@@ -25,7 +25,7 @@ class SearchResultScreen extends StatefulWidget {
 }
 
 class _SearchResultScreenState extends State<SearchResultScreen> {
-  final _controller = SearchController();
+  final _controller = search_ctrl.SearchController();
 
   @override
   void initState() {

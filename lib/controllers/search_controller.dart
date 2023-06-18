@@ -41,7 +41,7 @@ class SearchController {
         final nextPageKey = pageKey + 1;
         postPagingController.appendPage(searchResultList, nextPageKey);
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         debugPrint('SearchController: Dio error!');
         debugPrint('SearchController: STATUS: ${e.response?.statusCode}');

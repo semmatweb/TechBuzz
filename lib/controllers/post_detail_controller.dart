@@ -18,7 +18,7 @@ class PostDetailController {
     try {
       final response = await dio.get('/posts/$postID');
       postDetail = PostDetail.fromJson(response.data);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         debugPrint('PostDetailController: Dio error!');
         debugPrint('PostDetailController: STATUS: ${e.response?.statusCode}');
@@ -49,7 +49,7 @@ class PostDetailController {
 
       List? postData = response.data;
       postList = postData!.map((e) => Post.fromJson(e)).toList();
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         debugPrint('PostDetailController: Dio error!');
         debugPrint('PostDetailController: STATUS: ${e.response?.statusCode}');

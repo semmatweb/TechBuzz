@@ -11,6 +11,21 @@ import 'globals.dart';
 import 'screens/initialization_screen.dart';
 import 'screens/post_detail_screen.dart';
 
+// For iOS developer
+//
+// These packages need to be configured in order for your iOS app build to work.
+// Please read the documention on the link below how to configure it.
+//
+// - flutter_native_splash (https://pub.dev/packages/flutter_native_splash)
+// - share_plus (https://pub.dev/packages/share_plus)
+// - gallery_saver (https://pub.dev/packages/gallery_saver)
+// - google_mobile_ads (https://developers.google.com/admob/flutter/quick-start)
+// - facebook_audience_network (https://pub.dev/packages/facebook_audience_network)
+// - flutter_launcher_icons (https://pub.dev/packages/flutter_launcher_icons)
+// - flutter_web_browser (https://pub.dev/packages/flutter_web_browser)
+// - onesignal_flutter (https://documentation.onesignal.com/docs/flutter-sdk-setup)
+// - in_app_review (https://pub.dev/packages/in_app_review)
+
 Future<void> main() async {
   appNavigator = GlobalKey<NavigatorState>();
 

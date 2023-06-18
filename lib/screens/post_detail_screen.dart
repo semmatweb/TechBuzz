@@ -199,10 +199,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         if (!snapshot.hasData || snapshot.hasError) {
           return Scaffold(
             appBar: AppBar(),
-            body: Center(
+            body: const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Icon(
                     Icons.error,
                     color: Colors.red,
