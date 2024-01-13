@@ -1,4 +1,4 @@
-## Ini News
+## Tech Buzz
 
 News App built with Flutter as a mobile framework and backend with Wordpress.
 
